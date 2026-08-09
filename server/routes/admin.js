@@ -2,6 +2,7 @@ import { Router } from "express";
 import { store } from "../db/store.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import { TIERS } from "../config.js";
+import { auditLog } from "../lib/audit.js";
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
@@ -70,6 +71,54 @@ router.patch("/tickets/:id", (req, res) => {
 router.get("/orders", (req, res) => {
   const orders = store.all("orders").sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   res.json({ orders });
+});
+
+// PATCH /api/admin/users/:id/status — update user status (active, suspended, deleted)
+router.patch("/users/:id/status", (req, res) => {
+  const { status } = req.body || {};
+  if (!["active", "suspended", "deleted"].includes(status)) {
+    return res.status(400).json({ error: "Status must be 'active', 'suspended', or 'deleted'." });
+  }
+  const user = store.update("users", (u) => u.id === req.params.id, { status });
+  if (!user) return res.status(404).json({ error: "User not found." });
+  auditLog("user.status_change", req.user, { id: user.id, name: user.name }, { new_status: status, previous_status: user.status });
+  const { password_hash, ...safe } = user;
+  res.json({ user: safe });
+});
+
+// PATCH /api/admin/users/:id/tier — admin overrides a user's tier
+router.patch("/users/:id/tier", (req, res) => {
+  const { tier, tier_status } = req.body || {};
+  const validTiers = ["free", "pro", "business"];
+  const validStatuses = ["active", "expired", "grace"];
+  if (tier && !validTiers.includes(tier)) {
+    return res.status(400).json({ error: "Invalid tier." });
+  }
+  if (tier_status && !validStatuses.includes(tier_status)) {
+    return res.status(400).json({ error: "Invalid tier_status." });
+  }
+  const patch = {};
+  if (tier) patch.tier = tier;
+  if (tier_status) patch.tier_status = tier_status;
+  const user = store.update("users", (u) => u.id === req.params.id, patch);
+  if (!user) return res.status(404).json({ error: "User not found." });
+  auditLog("user.tier_change", req.user, { id: user.id, name: user.name }, { tier, tier_status });
+  const { password_hash, ...safe } = user;
+  res.json({ user: safe });
+});
+
+// PATCH /api/admin/users/:id/reset-password — admin resets a user's password
+router.patch("/users/:id/reset-password", async (req, res) => {
+  const { new_password } = req.body || {};
+  if (!new_password || new_password.length < 6) {
+    return res.status(400).json({ error: "New password must be at least 6 characters." });
+  }
+  const bcrypt = await import("bcryptjs");
+  const password_hash = bcrypt.hashSync(new_password, 10);
+  const user = store.update("users", (u) => u.id === req.params.id, { password_hash });
+  if (!user) return res.status(404).json({ error: "User not found." });
+  auditLog("user.password_reset", req.user, { id: user.id, name: user.name }, {});
+  res.json({ ok: true });
 });
 
 // PATCH /api/admin/fundis/:id/status — suspend or reactivate a fundi (e.g. during a dispute)

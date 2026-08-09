@@ -4,6 +4,47 @@ import { Banner } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import api, { errMsg } from "../../lib/api";
 
+function DangerZone() {
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
+
+  async function requestDeletion() {
+    if (!window.confirm("Are you sure you want to request account deletion? Andrew will review your request and contact you.")) return;
+    setLoading(true); setError("");
+    try {
+      await api.post("/tickets", {
+        subject: "Account deletion request",
+        message: "I would like to request deletion of my FundiPro account and all associated data.",
+      });
+      setDone(true);
+    } catch (err) {
+      setError(errMsg(err, "Could not submit request. Please try again."));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="card border border-bad/30 space-y-3">
+      <h2 className="section-title text-bad">Danger Zone</h2>
+      {error && <Banner kind="error">{error}</Banner>}
+      {done ? (
+        <Banner kind="success">Your account deletion request has been submitted. Andrew will contact you shortly.</Banner>
+      ) : (
+        <>
+          <p className="text-sm" style={{ color: "var(--muted)" }}>
+            Requesting account deletion will notify our team. Your data will be reviewed and deleted within 7 days.
+          </p>
+          <button onClick={requestDeletion} disabled={loading} className="btn-danger">
+            {loading ? "Submitting…" : "Request Account Deletion"}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 const GOVT_GUIDELINES = [
   { icon:"🏛️", title:"Business Registration", body:"Register your business with the Kenya Business Registration Service (BRS). A sole proprietor can register for as low as KES 950. This gives you a Business Name Certificate, which banks and big clients require." },
   { icon:"🧾", title:"Tax Compliance (KRA PIN)", body:"All businesses must have a KRA PIN number. File your annual returns even if you made no profit — failure to file attracts a penalty of KES 20,000. You can register and file at itax.kra.go.ke." },
@@ -109,6 +150,9 @@ export default function Settings() {
           ))}
           <p className="text-xs" style={{color:"var(--muted)"}}>Sources: Kenya Business Registration Service (BRS), Kenya Revenue Authority (KRA), NHIF, NSSF, EPRA, NEMA. Always consult a licensed professional for advice specific to your situation.</p>
         </div>
+
+        {/* Account Deletion */}
+        <DangerZone />
       </div>
     </FundiLayout>
   );

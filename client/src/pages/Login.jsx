@@ -22,7 +22,12 @@ export default function Login() {
       login(data.token, data.user);
       navigate(data.user.role === "admin" ? "/admin" : "/app");
     } catch (err) {
-      setError(errMsg(err, "Could not log in. Check your phone number and password."));
+      const data = err?.response?.data;
+      if (data?.suspended || data?.code === "ACCOUNT_SUSPENDED") {
+        setError("Your account has been suspended. Contact support on WhatsApp: 0107875549");
+      } else {
+        setError(errMsg(err, "Could not log in. Check your phone number and password."));
+      }
     } finally {
       setLoading(false);
     }
@@ -51,6 +56,12 @@ export default function Login() {
             <p>Free fundi: 0733333333 / fundi123</p>
           </div>
         </form>
+        <p className="mt-3 text-center text-xs" style={{ color: "var(--muted)" }}>
+          Forgot your password? Contact support on WhatsApp:{" "}
+          <a href="https://wa.me/2540107875549" target="_blank" rel="noreferrer" className="text-terracotta font-semibold">
+            0107875549
+          </a>
+        </p>
         <p className="mt-5 text-center text-sm text-muted">
           New to FundiPro? <Link to="/signup" className="text-terracotta font-semibold">Create a free account</Link>
         </p>
