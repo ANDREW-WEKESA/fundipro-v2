@@ -1,0 +1,887 @@
+{
+  "users": [
+    {
+      "id": "xwOy0S_xEcGS",
+      "created_at": "2026-07-06T15:42:41.563Z",
+      "name": "Andrew Wekesa",
+      "phone": "0710435113",
+      "password_hash": "$2a$10$Z4isd93k5jQejUqDAi3ImellF5QAwEI/SaitK79uCVj.jWvixFO/S",
+      "role": "admin",
+      "trade": "Platform Admin",
+      "location": "Kisii Town",
+      "slug": "andrew-admin",
+      "tier": "business",
+      "tier_status": "active",
+      "status": "active",
+      "jobs_count_this_month": 0,
+      "month_key": "2026-07",
+      "whatsapp": "0107875549",
+      "bio": "Founder of FundiPro.",
+      "photo_url": null,
+      "theme": "light"
+    },
+    {
+      "id": "bnJrA1-B7xw-",
+      "created_at": "2026-05-22T15:42:41.688Z",
+      "name": "John Mose",
+      "phone": "0711111111",
+      "trade": "Carpenter",
+      "location": "Daraja Mbili, Kisii",
+      "tier": "pro",
+      "bio": "Custom furniture and cabinet maker, 7 years experience.",
+      "whatsapp": "0711111111",
+      "password_hash": "$2a$10$j9id27JFysTNPJeYrQrx0OaZ3rZo3NohxXGXKYLkC8AzO6MCBgEyO",
+      "role": "fundi",
+      "slug": "john-mose",
+      "tier_status": "active",
+      "status": "active",
+      "jobs_count_this_month": 3,
+      "month_key": "2026-07",
+      "photo_url": null,
+      "theme": "light",
+      "views": 46,
+      "updated_at": "2026-07-06T15:55:37.731Z"
+    },
+    {
+      "id": "BXJZjAv8DxeK",
+      "created_at": "2026-05-22T15:42:41.846Z",
+      "name": "Grace Nyaboke",
+      "phone": "0722222222",
+      "trade": "Tailor",
+      "location": "Kisii Town Centre",
+      "tier": "pro",
+      "bio": "Dresses, school uniforms, and alterations.",
+      "whatsapp": "0722222222",
+      "password_hash": "$2a$10$2pBPPalOpDqkg62Gw5bvqeg7zbe/4iF3ai3z0cghMqbJgDbe9jlS2",
+      "role": "fundi",
+      "slug": "grace-nyaboke",
+      "tier_status": "active",
+      "status": "active",
+      "jobs_count_this_month": 2,
+      "month_key": "2026-07",
+      "photo_url": null,
+      "theme": "light",
+      "views": 25,
+      "updated_at": "2026-07-06T15:42:42.204Z"
+    },
+    {
+      "id": "wHG-TMQHWl-J",
+      "created_at": "2026-05-22T15:42:41.962Z",
+      "name": "Peter Ondieki",
+      "phone": "0733333333",
+      "trade": "Welder",
+      "location": "Mwembe, Kisii",
+      "tier": "free",
+      "bio": "Gates, grills, and metal fabrication.",
+      "whatsapp": "0733333333",
+      "password_hash": "$2a$10$LDlzaPleCl68y6F3FYrTOeAd.zal..U4FaRfuDLYC5s9qyfiKbfHK",
+      "role": "fundi",
+      "slug": "peter-ondieki",
+      "tier_status": "active",
+      "status": "active",
+      "jobs_count_this_month": 0,
+      "month_key": "2026-07",
+      "photo_url": null,
+      "theme": "light",
+      "views": 6
+    },
+    {
+      "id": "f9s6mPIRNXNi",
+      "created_at": "2026-05-22T15:42:42.085Z",
+      "name": "Mary Kerubo",
+      "phone": "0744444444",
+      "trade": "Salon & Beauty",
+      "location": "Kisii Market",
+      "tier": "business",
+      "bio": "Braiding, treatments, and bridal styling.",
+      "whatsapp": "0744444444",
+      "password_hash": "$2a$10$3ANNfRUYf/nwXZ2srhQTX.D0Zv54NeR1JRyQhPq77KfMBZa4MVDMC",
+      "role": "fundi",
+      "slug": "mary-kerubo",
+      "tier_status": "active",
+      "status": "active",
+      "jobs_count_this_month": 0,
+      "month_key": "2026-07",
+      "photo_url": null,
+      "theme": "light",
+      "views": 16
+    },
+    {
+      "id": "UswS9EHB8b6X",
+      "created_at": "2026-05-22T15:42:42.199Z",
+      "name": "Samuel Otieno",
+      "phone": "0755555555",
+      "trade": "Mechanic",
+      "location": "Garage Row, Kisii",
+      "tier": "free",
+      "bio": "Car and motorbike repair, 10 years on the job.",
+      "whatsapp": "0755555555",
+      "password_hash": "$2a$10$/Mc5Gmwup2lWDqiJlnC6bu9CLvWMfQwhOdFXgzQPwI158F.ZVFHE.",
+      "role": "fundi",
+      "slug": "samuel-otieno",
+      "tier_status": "active",
+      "status": "active",
+      "jobs_count_this_month": 0,
+      "month_key": "2026-07",
+      "photo_url": null,
+      "theme": "light",
+      "views": 10
+    }
+  ],
+  "jobs": [
+    {
+      "id": "f9yyiN3m8mm-",
+      "created_at": "2026-06-24T15:42:42.200Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Wooden bed frame",
+      "sale_price": 25000,
+      "material_cost": 14000,
+      "labour_cost": 4000,
+      "transport_cost": 800,
+      "profit": 6200,
+      "margin_pct": 24.8,
+      "client_name": "Mama Risper"
+    },
+    {
+      "id": "sh6mpGScuVes",
+      "created_at": "2026-06-30T15:42:42.200Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Kitchen cabinet set",
+      "sale_price": 48000,
+      "material_cost": 27000,
+      "labour_cost": 9000,
+      "transport_cost": 1500,
+      "profit": 10500,
+      "margin_pct": 21.9,
+      "client_name": "Mama Risper"
+    },
+    {
+      "id": "qoJKtcr-7peT",
+      "created_at": "2026-07-05T15:42:42.200Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Office desk",
+      "sale_price": 15000,
+      "material_cost": 8000,
+      "labour_cost": 3000,
+      "transport_cost": 500,
+      "profit": 3500,
+      "margin_pct": 23.3,
+      "client_name": "Mama Risper"
+    },
+    {
+      "id": "Ucvr-ETe09_Y",
+      "created_at": "2026-06-27T15:42:42.203Z",
+      "user_id": "BXJZjAv8DxeK",
+      "title": "Bridal gown",
+      "sale_price": 18000,
+      "material_cost": 9000,
+      "labour_cost": 3500,
+      "transport_cost": 300,
+      "client_name": "Esther W.",
+      "profit": 5200,
+      "margin_pct": 28.9
+    },
+    {
+      "id": "s6Trui0wkVyr",
+      "created_at": "2026-07-03T15:42:42.203Z",
+      "user_id": "BXJZjAv8DxeK",
+      "title": "School uniform batch (20pc)",
+      "sale_price": 22000,
+      "material_cost": 13000,
+      "labour_cost": 4000,
+      "transport_cost": 600,
+      "client_name": "St. Mary's Academy",
+      "profit": 4400,
+      "margin_pct": 20
+    }
+  ],
+  "clients": [],
+  "storefront_items": [
+    {
+      "id": "MRnCI1pNN8Wy",
+      "created_at": "2026-07-06T15:42:42.205Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Mahogany dining table",
+      "description": "Seats 6, solid mahogany.",
+      "cash_price": 38000,
+      "hp_price": 44000,
+      "status": "reserved",
+      "photos": [
+        "/images/ke-dining-1.jpg",
+        "/images/ke-dining-2.jpg",
+        "/images/ke-dining-3.jpg"
+      ],
+      "completed_at": "2026-06-16T15:42:42.205Z",
+      "updated_at": "2026-07-06T15:55:12.462Z"
+    },
+    {
+      "id": "uHZihC5bNnAE",
+      "created_at": "2026-07-06T15:42:42.206Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Bedside table (pair)",
+      "description": "Two matching bedside tables.",
+      "cash_price": 9500,
+      "hp_price": 11000,
+      "status": "available",
+      "photos": [
+        "/images/ke-bedside-1.jpg",
+        "/images/ke-bedside-2.jpg",
+        "/images/ke-bedside-3.jpg"
+      ],
+      "completed_at": "2026-06-21T15:42:42.205Z",
+      "updated_at": "2026-07-06T15:55:12.456Z"
+    },
+    {
+      "id": "uw0ERF1sQhOe",
+      "created_at": "2026-07-06T15:42:42.207Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "L-shaped office desk",
+      "description": "In the workshop — almost done.",
+      "cash_price": 27000,
+      "hp_price": 31000,
+      "status": "in_progress",
+      "photos": [
+        "/images/ke-shelf-1.jpg",
+        "/images/ke-shelf-2.jpg",
+        "/images/ke-shelf-3.jpg"
+      ],
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.449Z"
+    },
+    {
+      "id": "L5z5Ldu3qKj5",
+      "created_at": "2026-07-06T15:42:42.207Z",
+      "user_id": "BXJZjAv8DxeK",
+      "title": "Custom Ankara dress",
+      "description": "Made to measure, 5-day turnaround.",
+      "cash_price": 4500,
+      "hp_price": 5200,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-06-26T15:42:42.205Z"
+    },
+    {
+      "id": "03SG2WwV3r9o",
+      "created_at": "2026-07-06T15:42:42.208Z",
+      "user_id": "BXJZjAv8DxeK",
+      "title": "School uniform set",
+      "description": "Bulk orders welcome, standard or custom colours.",
+      "cash_price": 1800,
+      "hp_price": 2200,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-07-01T15:42:42.205Z"
+    },
+    {
+      "id": "Cc2QmCo1azwI",
+      "created_at": "2026-07-06T15:42:42.208Z",
+      "user_id": "BXJZjAv8DxeK",
+      "title": "Bridal gown (custom)",
+      "description": "Fully custom — lace, satin, or chiffon.",
+      "cash_price": 22000,
+      "hp_price": 26000,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-06-14T15:42:42.205Z"
+    },
+    {
+      "id": "1Z84VjqrvZ-P",
+      "created_at": "2026-07-06T15:42:42.209Z",
+      "user_id": "wHG-TMQHWl-J",
+      "title": "Security gate (double leaf)",
+      "description": "Heavy gauge steel, powder coated.",
+      "cash_price": 32000,
+      "hp_price": 37000,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-06-18T15:42:42.205Z"
+    },
+    {
+      "id": "YdNaLDBaSIuM",
+      "created_at": "2026-07-06T15:42:42.209Z",
+      "user_id": "wHG-TMQHWl-J",
+      "title": "Window grills (per window)",
+      "description": "Custom designs, priced per window.",
+      "cash_price": 4500,
+      "hp_price": 5500,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-06-28T15:42:42.205Z"
+    },
+    {
+      "id": "jh_T4KLs97Y_",
+      "created_at": "2026-07-06T15:42:42.210Z",
+      "user_id": "wHG-TMQHWl-J",
+      "title": "Steel staircase railing",
+      "description": "Indoor or outdoor, any length.",
+      "cash_price": 18000,
+      "hp_price": 21000,
+      "status": "in_progress",
+      "photos": [],
+      "completed_at": null
+    },
+    {
+      "id": "-gpyNiFCiEPk",
+      "created_at": "2026-07-06T15:42:42.210Z",
+      "user_id": "f9s6mPIRNXNi",
+      "title": "Bridal package",
+      "description": "Hair, makeup, and nails for the big day.",
+      "cash_price": 12000,
+      "hp_price": 14000,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-06-06T15:42:42.205Z"
+    },
+    {
+      "id": "FFNYq589KKPX",
+      "created_at": "2026-07-06T15:42:42.211Z",
+      "user_id": "f9s6mPIRNXNi",
+      "title": "Box braids (full head)",
+      "description": "Small, medium, or large — any length.",
+      "cash_price": 2500,
+      "hp_price": 3000,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-07-03T15:42:42.205Z"
+    },
+    {
+      "id": "5lbvYBUByNW7",
+      "created_at": "2026-07-06T15:42:42.211Z",
+      "user_id": "f9s6mPIRNXNi",
+      "title": "Keratin treatment",
+      "description": "Smooth, frizz-free results that last 3 months.",
+      "cash_price": 3500,
+      "hp_price": 4200,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-06-29T15:42:42.205Z"
+    },
+    {
+      "id": "bRvJeMW4r7Oe",
+      "created_at": "2026-07-06T15:42:42.212Z",
+      "user_id": "UswS9EHB8b6X",
+      "title": "Full car service",
+      "description": "Oil, filters, plugs, and inspection.",
+      "cash_price": 4500,
+      "hp_price": 5500,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-07-02T15:42:42.205Z"
+    },
+    {
+      "id": "T-mB5tuU3A7e",
+      "created_at": "2026-07-06T15:42:42.213Z",
+      "user_id": "UswS9EHB8b6X",
+      "title": "Brake pad replacement",
+      "description": "Front and rear, all vehicle types.",
+      "cash_price": 3200,
+      "hp_price": 3800,
+      "status": "available",
+      "photos": [],
+      "completed_at": "2026-06-25T15:42:42.205Z"
+    },
+    {
+      "id": "7Nu_IySn2TKR",
+      "created_at": "2026-07-06T15:42:42.214Z",
+      "user_id": "UswS9EHB8b6X",
+      "title": "Engine diagnostics & tune-up",
+      "description": "Computer scan + full tune-up.",
+      "cash_price": 2800,
+      "hp_price": 3300,
+      "status": "in_progress",
+      "photos": [],
+      "completed_at": null
+    },
+    {
+      "id": "l6mO16Pkn71M",
+      "created_at": "2026-07-06T15:46:26.548Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Bar stools (set of 4)",
+      "description": "Adjustable height, mahogany finish.",
+      "cash_price": 16000,
+      "hp_price": 18500,
+      "photos": [
+        "/images/ke-dining-1.jpg",
+        "/images/ke-dining-2.jpg",
+        "/images/ke-dining-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.442Z"
+    },
+    {
+      "id": "Nq2Q4d4l8E50",
+      "created_at": "2026-07-06T15:46:26.555Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Coffee table (oval)",
+      "description": "Glass-top insert, carved mahogany legs.",
+      "cash_price": 12500,
+      "hp_price": 14500,
+      "photos": [
+        "/images/ke-coffee-1.jpg",
+        "/images/ke-coffee-2.jpg",
+        "/images/ke-coffee-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.435Z"
+    },
+    {
+      "id": "ud1XO34MqzWd",
+      "created_at": "2026-07-06T15:46:26.561Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Church pews (per unit)",
+      "description": "Bulk order pricing available on request.",
+      "cash_price": 9000,
+      "hp_price": 10500,
+      "photos": [
+        "/images/ke-dining-1.jpg",
+        "/images/ke-dining-2.jpg",
+        "/images/ke-dining-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.430Z"
+    },
+    {
+      "id": "FVdt-CAQ30L-",
+      "created_at": "2026-07-06T15:46:26.566Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Custom coffin (standard)",
+      "description": "Quality mahogany, available on short notice.",
+      "cash_price": 15000,
+      "hp_price": 17000,
+      "photos": [
+        "/images/ke-shelf-1.jpg",
+        "/images/ke-shelf-2.jpg",
+        "/images/ke-shelf-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.424Z"
+    },
+    {
+      "id": "HZYdvfFWfNS5",
+      "created_at": "2026-07-06T15:46:26.572Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Bookshelf (5-tier)",
+      "description": "Tall standing shelf, holds 150+ books.",
+      "cash_price": 13500,
+      "hp_price": 15800,
+      "photos": [
+        "/images/ke-shelf-1.jpg",
+        "/images/ke-shelf-2.jpg",
+        "/images/ke-shelf-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.417Z"
+    },
+    {
+      "id": "fV0gX03k8yiD",
+      "created_at": "2026-07-06T15:46:26.578Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Shoe rack with bench",
+      "description": "3-tier rack with cushioned seating top.",
+      "cash_price": 8500,
+      "hp_price": 10000,
+      "photos": [
+        "/images/ke-shoerack-1.jpg",
+        "/images/ke-shoerack-2.jpg",
+        "/images/ke-shoerack-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.411Z"
+    },
+    {
+      "id": "HgZ0bBHRWpkc",
+      "created_at": "2026-07-06T15:46:26.583Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Outdoor patio set",
+      "description": "Table + 4 chairs, weather-treated wood.",
+      "cash_price": 24000,
+      "hp_price": 28000,
+      "photos": [
+        "/images/ke-patio-1.jpg",
+        "/images/ke-patio-2.jpg",
+        "/images/ke-patio-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.405Z"
+    },
+    {
+      "id": "LL_r6xHwlsnY",
+      "created_at": "2026-07-06T15:46:26.589Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Baby crib (convertible)",
+      "description": "Converts to toddler bed, solid mahogany.",
+      "cash_price": 18500,
+      "hp_price": 21500,
+      "photos": [
+        "/images/ke-bedside-1.jpg",
+        "/images/ke-bedside-2.jpg",
+        "/images/ke-bedside-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.397Z"
+    },
+    {
+      "id": "E7E8u5199zit",
+      "created_at": "2026-07-06T15:46:26.595Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "TV stand with shelves",
+      "description": "Fits up to 55-inch TV, 3 storage shelves.",
+      "cash_price": 14000,
+      "hp_price": 16500,
+      "photos": [
+        "/images/ke-shelf-1.jpg",
+        "/images/ke-shelf-2.jpg",
+        "/images/ke-shelf-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.391Z"
+    },
+    {
+      "id": "OheckGehf5Wn",
+      "created_at": "2026-07-06T15:46:26.600Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Wardrobe (3-door)",
+      "description": "Spacious, with mirror on centre door.",
+      "cash_price": 28000,
+      "hp_price": 33000,
+      "photos": [
+        "/images/ke-bedside-1.jpg",
+        "/images/ke-bedside-2.jpg",
+        "/images/ke-bedside-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.384Z"
+    },
+    {
+      "id": "bo059suit-TJ",
+      "created_at": "2026-07-06T15:46:26.606Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Kitchen cabinet set",
+      "description": "Upper and lower units, 8 doors total.",
+      "cash_price": 55000,
+      "hp_price": 64000,
+      "photos": [
+        "/images/ke-coffee-1.jpg",
+        "/images/ke-coffee-2.jpg",
+        "/images/ke-coffee-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.378Z"
+    },
+    {
+      "id": "UMGDUNVyUgvD",
+      "created_at": "2026-07-06T15:46:26.612Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Study desk with drawers",
+      "description": "Compact, 3 drawers, perfect for students.",
+      "cash_price": 11000,
+      "hp_price": 13000,
+      "photos": [
+        "/images/ke-shelf-1.jpg",
+        "/images/ke-shelf-2.jpg",
+        "/images/ke-shelf-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.368Z"
+    },
+    {
+      "id": "VqnMiPsIHhKc",
+      "created_at": "2026-07-06T15:46:26.617Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Dining chairs (set of 6)",
+      "description": "Matches the mahogany dining table.",
+      "cash_price": 21000,
+      "hp_price": 24500,
+      "photos": [
+        "/images/ke-dining-1.jpg",
+        "/images/ke-dining-2.jpg",
+        "/images/ke-dining-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.362Z"
+    },
+    {
+      "id": "ue2fpGbj87FW",
+      "created_at": "2026-07-06T15:46:26.623Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "6-seater sofa set",
+      "description": "Cushioned, mahogany frame, modern design.",
+      "cash_price": 65000,
+      "hp_price": 75000,
+      "photos": [
+        "/images/ke-patio-1.jpg",
+        "/images/ke-patio-2.jpg",
+        "/images/ke-patio-3.jpg"
+      ],
+      "status": "available",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.355Z"
+    },
+    {
+      "id": "YLnRAlZiZm1V",
+      "created_at": "2026-07-06T15:46:26.628Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Pulpit / lectern",
+      "description": "Custom church furniture, hand-finished.",
+      "cash_price": 0,
+      "hp_price": 0,
+      "photos": [
+        "/images/ke-dining-1.jpg",
+        "/images/ke-dining-2.jpg",
+        "/images/ke-dining-3.jpg"
+      ],
+      "status": "in_progress",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.348Z"
+    },
+    {
+      "id": "ZmuOb4P32_3q",
+      "created_at": "2026-07-06T15:46:26.633Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "Reception desk",
+      "description": "Built for a small office, 2-person width.",
+      "cash_price": 0,
+      "hp_price": 0,
+      "photos": [
+        "/images/ke-shelf-1.jpg",
+        "/images/ke-shelf-2.jpg",
+        "/images/ke-shelf-3.jpg"
+      ],
+      "status": "in_progress",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.342Z"
+    },
+    {
+      "id": "paDC1FtoVgeN",
+      "created_at": "2026-07-06T15:46:26.639Z",
+      "user_id": "bnJrA1-B7xw-",
+      "title": "King size bed frame",
+      "description": "Solid mahogany, fits standard king mattress.",
+      "cash_price": 32000,
+      "hp_price": 38000,
+      "photos": [
+        "/images/ke-kingbed-1.jpg",
+        "/images/ke-kingbed-2.jpg",
+        "/images/ke-kingbed-3.jpg"
+      ],
+      "status": "reserved",
+      "completed_at": null,
+      "updated_at": "2026-07-06T15:55:12.330Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "q-QorL3PVzJF",
+      "created_at": "2026-07-06T15:42:42.215Z",
+      "user_id": "bnJrA1-B7xw-",
+      "reviewer_name": "Esther W.",
+      "rating": 5,
+      "comment": "Beautiful work, delivered on time!"
+    },
+    {
+      "id": "pT3pnj_n7UI3",
+      "created_at": "2026-07-06T15:42:42.216Z",
+      "user_id": "bnJrA1-B7xw-",
+      "reviewer_name": "Brian K.",
+      "rating": 4,
+      "comment": "Good quality, slightly delayed delivery."
+    },
+    {
+      "id": "3R86uxor64-n",
+      "created_at": "2026-07-06T15:42:42.217Z",
+      "user_id": "BXJZjAv8DxeK",
+      "reviewer_name": "St. Mary's Academy",
+      "rating": 5,
+      "comment": "Reliable for bulk uniform orders every term."
+    },
+    {
+      "id": "z9DOyKQlxwnf",
+      "created_at": "2026-07-06T15:42:42.218Z",
+      "user_id": "f9s6mPIRNXNi",
+      "reviewer_name": "Faith N.",
+      "rating": 5,
+      "comment": "Did my wedding look perfectly. Highly recommend!"
+    }
+  ],
+  "payments": [
+    {
+      "id": "CNN9ozWQ3kO2",
+      "created_at": "2026-07-06T15:42:42.219Z",
+      "user_id": "bnJrA1-B7xw-",
+      "tier": "pro",
+      "amount": 500,
+      "status": "success",
+      "mpesa_ref": "MPESA8X2K9F1A"
+    },
+    {
+      "id": "4bm9i6h2oHxi",
+      "created_at": "2026-07-06T15:42:42.251Z",
+      "user_id": "BXJZjAv8DxeK",
+      "tier": "pro",
+      "amount": 500,
+      "status": "success",
+      "mpesa_ref": "MPESA7H3J2P0Q"
+    },
+    {
+      "id": "smzi28d_6XD4",
+      "created_at": "2026-07-06T15:42:42.252Z",
+      "user_id": "f9s6mPIRNXNi",
+      "tier": "business",
+      "amount": 1200,
+      "status": "success",
+      "mpesa_ref": "MPESA1Z9Y8X7W"
+    }
+  ],
+  "tickets": [
+    {
+      "id": "qctaE1pV5MKw",
+      "created_at": "2026-07-06T15:42:42.253Z",
+      "user_id": "wHG-TMQHWl-J",
+      "user_name": "Peter Ondieki",
+      "subject": "Can't upload job photo",
+      "message": "The photo upload button doesn't respond on my phone.",
+      "status": "open"
+    },
+    {
+      "id": "4aQ83WYYRaEx",
+      "created_at": "2026-07-06T15:42:42.254Z",
+      "user_id": "UswS9EHB8b6X",
+      "user_name": "Samuel Otieno",
+      "subject": "M-Pesa payment not reflecting",
+      "message": "I paid for Pro but my account still shows Free.",
+      "status": "open"
+    }
+  ],
+  "materials": [
+    {
+      "id": "nCPrOfqhsV5W",
+      "created_at": "2026-07-06T15:42:42.255Z",
+      "user_id": "bnJrA1-B7xw-",
+      "name": "Mahogany timber (4x2)",
+      "quantity": 18,
+      "unit": "pieces",
+      "low_stock_threshold": 5
+    },
+    {
+      "id": "XjqR-o_Domwb",
+      "created_at": "2026-07-06T15:42:42.255Z",
+      "user_id": "bnJrA1-B7xw-",
+      "name": "Wood glue",
+      "quantity": 2,
+      "unit": "litres",
+      "low_stock_threshold": 3
+    },
+    {
+      "id": "HcrtWDolMQzs",
+      "created_at": "2026-07-06T15:42:42.256Z",
+      "user_id": "bnJrA1-B7xw-",
+      "name": "Sandpaper (120 grit)",
+      "quantity": 40,
+      "unit": "sheets",
+      "low_stock_threshold": 10
+    },
+    {
+      "id": "jn33-Q2vSYnH",
+      "created_at": "2026-07-06T15:42:42.257Z",
+      "user_id": "BXJZjAv8DxeK",
+      "name": "Ankara fabric",
+      "quantity": 12,
+      "unit": "metres",
+      "low_stock_threshold": 5
+    },
+    {
+      "id": "BUvfp6NqL2II",
+      "created_at": "2026-07-06T15:42:42.257Z",
+      "user_id": "BXJZjAv8DxeK",
+      "name": "Thread (assorted)",
+      "quantity": 3,
+      "unit": "spools",
+      "low_stock_threshold": 5
+    }
+  ],
+  "material_logs": [],
+  "orders": [
+    {
+      "id": "WeM1sDqGpABO",
+      "created_at": "2026-07-06T15:42:42.258Z",
+      "fundi_id": "bnJrA1-B7xw-",
+      "product_id": "uHZihC5bNnAE",
+      "product_title": "Bedside table (pair)",
+      "customer_name": "Janet M.",
+      "customer_phone": "0798111222",
+      "order_type": "stock",
+      "payment_type": "cash",
+      "total_price": 9500,
+      "amount_paid": 9500,
+      "status": "completed",
+      "notes": "",
+      "placed_by": "customer"
+    },
+    {
+      "id": "mUPNhmHShouC",
+      "created_at": "2026-07-06T15:42:42.259Z",
+      "fundi_id": "bnJrA1-B7xw-",
+      "product_id": "MRnCI1pNN8Wy",
+      "product_title": "Mahogany dining table",
+      "customer_name": "Robert K.",
+      "customer_phone": "0798333444",
+      "order_type": "stock",
+      "payment_type": "hp",
+      "total_price": 44000,
+      "amount_paid": 20000,
+      "status": "partial",
+      "notes": "",
+      "placed_by": "fundi"
+    },
+    {
+      "id": "OK4Di3PZF6Ta",
+      "created_at": "2026-07-06T15:42:42.260Z",
+      "fundi_id": "BXJZjAv8DxeK",
+      "product_id": null,
+      "product_title": "Custom suit, navy blue",
+      "customer_name": "David O.",
+      "customer_phone": "0798555666",
+      "order_type": "custom",
+      "payment_type": "cash",
+      "total_price": 0,
+      "amount_paid": 0,
+      "status": "requested",
+      "notes": "Wants something like the bridal gown but in navy for a graduation.",
+      "placed_by": "customer"
+    }
+  ],
+  "messages": [
+    {
+      "id": "LvMTEE88gPEp",
+      "created_at": "2026-07-06T15:42:42.262Z",
+      "from_user_id": "wHG-TMQHWl-J",
+      "to_user_id": "xwOy0S_xEcGS",
+      "body": "Habari Andrew, my M-Pesa upgrade to Pro didn't go through, can you check?",
+      "system": false,
+      "read": true
+    },
+    {
+      "id": "GFokF-1UW8Pu",
+      "created_at": "2026-07-06T15:42:42.263Z",
+      "from_user_id": "xwOy0S_xEcGS",
+      "to_user_id": "wHG-TMQHWl-J",
+      "body": "Nimeona Peter, looking into it now — give me a few minutes.",
+      "system": false,
+      "read": true
+    }
+  ],
+  "reports": []
+}
