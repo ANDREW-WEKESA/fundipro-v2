@@ -10,6 +10,21 @@ const PLANS = [
   { id: "business", label: "Business", price: 1200, features: ["Everything in Pro", "Client management", "SMS reminders", "Priority support"] },
 ];
 
+const FEATURE_COMPARISON = [
+  { feature: "Monthly jobs limit", free: "3 jobs", pro: "Unlimited", business: "Unlimited" },
+  { feature: "Job cost calculator", free: "✅", pro: "✅", business: "✅" },
+  { feature: "Full job history", free: "✅", pro: "✅", business: "✅" },
+  { feature: "Sales tracking", free: "✅", pro: "✅", business: "✅" },
+  { feature: "Expense tracking", free: "✅", pro: "✅", business: "✅" },
+  { feature: "Profit reports + PDF", free: "✅", pro: "✅", business: "✅" },
+  { feature: "Materials inventory", free: "✅", pro: "✅", business: "✅" },
+  { feature: "Public storefront", free: "❌", pro: "✅", business: "✅" },
+  { feature: "M-Pesa invoices", free: "❌", pro: "✅", business: "✅" },
+  { feature: "Client management", free: "❌", pro: "❌", business: "✅" },
+  { feature: "SMS reminders to clients", free: "❌", pro: "❌", business: "✅" },
+  { feature: "Priority support", free: "❌", pro: "❌", business: "✅" },
+];
+
 function StkModal({ tier, onClose, onSuccess }) {
   const [status, setStatus] = useState("sending"); // sending -> pending -> success/failed
   const firedRef = useRef(false);
@@ -126,6 +141,36 @@ export default function Billing() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Feature comparison table */}
+        <div>
+          <h2 className="font-display font-bold text-bark mb-3">What's included in each plan</h2>
+          <div className="card !p-0 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b" style={{ borderColor: "var(--border)" }}>
+                  <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>Feature</th>
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>Free</th>
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-widest text-terracotta">Pro</th>
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>Business</th>
+                </tr>
+              </thead>
+              <tbody>
+                {FEATURE_COMPARISON.map((row, i) => (
+                  <tr key={i} className="border-b last:border-0" style={{ borderColor: "var(--border)" }}>
+                    <td className="px-5 py-3 font-medium" style={{ color: "var(--ink)" }}>{row.feature}</td>
+                    <td className="px-4 py-3 text-center" style={{ color: "var(--muted)" }}>{row.free}</td>
+                    <td className="px-4 py-3 text-center font-semibold"
+                      style={{ color: row.pro === "❌" ? "var(--muted)" : "var(--ink)", background: user.tier === "pro" ? "var(--sand)" : undefined }}>
+                      {row.pro}
+                    </td>
+                    <td className="px-4 py-3 text-center" style={{ color: row.business === "❌" ? "var(--muted)" : "var(--ink)" }}>{row.business}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
