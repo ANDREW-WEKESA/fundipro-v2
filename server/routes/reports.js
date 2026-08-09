@@ -15,12 +15,6 @@ function lastReportFor(userId) {
 }
 
 // GET /api/reports/status — is a fresh 20-day statement due?
-// NOTE: this app has no real background scheduler, so "automatic" works by
-// checking on every visit to the Statistics page whether 20 days have passed
-// since the last statement, and surfacing a banner if so. A production
-// deployment would replace this check with a Cloudflare Cron Trigger that
-// generates + emails/WhatsApps the PDF on a fixed schedule without the fundi
-// needing to open the app at all.
 router.get("/status", (req, res) => {
   const last = lastReportFor(req.user.id);
   const lastDate = last ? new Date(last.generated_at) : new Date(req.user.created_at);
@@ -39,6 +33,138 @@ router.get("/", (req, res) => {
     .all("reports", (r) => r.user_id === req.user.id)
     .sort((a, b) => new Date(b.generated_at) - new Date(a.generated_at));
   res.json({ reports });
+});
+
+// GET /api/reports/profit?from=&to= — profit aggregation for date range
+router.get("/profit", (req, res) => {
+  const { from, to } = req.query;
+  const userId = req.user.id;
+
+  // Sales in range
+  let sales = store.all("sales", (s) => s.user_id === userId);
+  if (from) sales = sales.filter((s) => s.date >= from);
+  if (to) sales = sales.filter((s) => s.date <= to);
+  const salesTotal = sales.reduce((acc, s) => acc + (s.amount || 0), 0);
+
+  // Completed jobs with sale prices in range (use created_at date)
+  let jobs = store.all("jobs", (j) => j.user_id === userId);
+  if (from) jobs = jobs.filter((j) => (j.created_at || "").slice(0, 10) >= from);
+  if (to) jobs = jobs.filter((j) => (j.created_at || "").slice(0, 10) <= to);
+  const jobsTotal = jobs.reduce((acc, j) => acc + (j.sale_price || 0), 0);
+
+  const total_income = salesTotal + jobsTotal;
+
+  // Expenses in range
+  let expenses = store.all("expenses", (e) => e.user_id === userId);
+  if (from) expenses = expenses.filter((e) => e.date >= from);
+  if (to) expenses = expenses.filter((e) => e.date <= to);
+  const total_expenses = expenses.reduce((acc, e) => acc + (e.amount || 0), 0);
+
+  const gross_profit = total_income - total_expenses;
+  const margin_pct = total_income > 0 ? (gross_profit / total_income) * 100 : 0;
+
+  const income_by_source = { jobs: jobsTotal, sales: salesTotal };
+
+  const expenses_by_category = {};
+  for (const e of expenses) {
+    expenses_by_category[e.category] = (expenses_by_category[e.category] || 0) + (e.amount || 0);
+  }
+
+  res.json({
+    total_income,
+    total_expenses,
+    gross_profit,
+    margin_pct,
+    income_by_source,
+    expenses_by_category,
+  });
+});
+
+// GET /api/reports/profit/pdf?from=&to= — profit report PDF
+router.get("/profit/pdf", (req, res) => {
+  const { from, to } = req.query;
+  const user = req.user;
+  const userId = user.id;
+
+  // Sales
+  let sales = store.all("sales", (s) => s.user_id === userId);
+  if (from) sales = sales.filter((s) => s.date >= from);
+  if (to) sales = sales.filter((s) => s.date <= to);
+  const salesTotal = sales.reduce((acc, s) => acc + (s.amount || 0), 0);
+
+  // Jobs
+  let jobs = store.all("jobs", (j) => j.user_id === userId);
+  if (from) jobs = jobs.filter((j) => (j.created_at || "").slice(0, 10) >= from);
+  if (to) jobs = jobs.filter((j) => (j.created_at || "").slice(0, 10) <= to);
+  const jobsTotal = jobs.reduce((acc, j) => acc + (j.sale_price || 0), 0);
+
+  const total_income = salesTotal + jobsTotal;
+
+  // Expenses
+  let expenses = store.all("expenses", (e) => e.user_id === userId);
+  if (from) expenses = expenses.filter((e) => e.date >= from);
+  if (to) expenses = expenses.filter((e) => e.date <= to);
+  const total_expenses = expenses.reduce((acc, e) => acc + (e.amount || 0), 0);
+
+  const gross_profit = total_income - total_expenses;
+  const margin_pct = total_income > 0 ? ((gross_profit / total_income) * 100).toFixed(1) : "0";
+
+  const expenses_by_category = {};
+  for (const e of expenses) {
+    expenses_by_category[e.category] = (expenses_by_category[e.category] || 0) + (e.amount || 0);
+  }
+
+  const dateRange = from && to ? `${from} to ${to}` : from ? `From ${from}` : to ? `To ${to}` : "All time";
+  const filename = `FundiPro-Profit-${user.slug || user.id}-${new Date().toISOString().slice(0, 10)}.pdf`;
+
+  const doc = new PDFDocument({ margin: 50 });
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  doc.pipe(res);
+
+  // Header
+  doc.fontSize(20).fillColor("#B85042").text("FundiPro", { continued: true }).fillColor("#3A2E2A").text("  Profit Report");
+  doc.moveDown(0.3);
+  doc.fontSize(10).fillColor("#6B6058").text(`${user.name} · ${user.trade || ""} · ${user.location || ""}`);
+  doc.text(`Period: ${dateRange}`);
+  doc.text(`Generated: ${new Date().toLocaleDateString()}`);
+  doc.moveDown();
+  doc.strokeColor("#E7E8D1").lineWidth(2).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
+  doc.moveDown();
+
+  // Summary
+  doc.fontSize(13).fillColor("#3A2E2A").text("Summary");
+  doc.moveDown(0.4);
+  doc.fontSize(11).fillColor("#33302E");
+  doc.text(`Total Income:    KES ${total_income.toLocaleString()}`);
+  doc.text(`Total Expenses:  KES ${total_expenses.toLocaleString()}`);
+  doc.text(`Gross Profit:    KES ${gross_profit.toLocaleString()}`);
+  doc.text(`Profit Margin:   ${margin_pct}%`);
+  doc.moveDown();
+
+  // Income breakdown
+  doc.fontSize(13).fillColor("#3A2E2A").text("Income Breakdown");
+  doc.moveDown(0.4);
+  doc.fontSize(10).fillColor("#6B6058");
+  doc.text(`Jobs revenue:  KES ${jobsTotal.toLocaleString()} (${jobs.length} jobs)`);
+  doc.text(`Direct sales:  KES ${salesTotal.toLocaleString()} (${sales.length} sales)`);
+  doc.moveDown();
+
+  // Expenses breakdown
+  if (Object.keys(expenses_by_category).length > 0) {
+    doc.fontSize(13).fillColor("#3A2E2A").text("Expenses by Category");
+    doc.moveDown(0.4);
+    doc.fontSize(10).fillColor("#6B6058");
+    for (const [cat, amt] of Object.entries(expenses_by_category)) {
+      doc.text(`${cat.charAt(0).toUpperCase() + cat.slice(1)}:  KES ${amt.toLocaleString()}`);
+    }
+    doc.moveDown();
+  }
+
+  doc.moveDown();
+  doc.fontSize(9).fillColor("#A7BEAE").text("Generated by FundiPro — track every shilling, grow your business.", { align: "center" });
+
+  doc.end();
 });
 
 // GET /api/reports/generate — builds and streams a PDF statement, and logs it

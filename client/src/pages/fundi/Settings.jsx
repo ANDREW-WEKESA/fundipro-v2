@@ -13,7 +13,7 @@ function DangerZone() {
     if (!window.confirm("Are you sure you want to request account deletion? Andrew will review your request and contact you.")) return;
     setLoading(true); setError("");
     try {
-      await api.post("/tickets", {
+      await api.post("/users/tickets", {
         subject: "Account deletion request",
         message: "I would like to request deletion of my FundiPro account and all associated data.",
       });
