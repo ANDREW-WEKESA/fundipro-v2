@@ -27,6 +27,9 @@ const EMPTY_DB = {
   orders: [],            // customer or fundi-placed product orders
   messages: [],            // fundi <-> admin chat, plus automated reminders
   reports: [],               // metadata for generated 20-day PDF statements
+  audit_logs: [],            // admin audit trail for sensitive actions
+  sales: [],                 // fundi direct sales records
+  expenses: [],              // fundi expense records
 };
 
 function load() {

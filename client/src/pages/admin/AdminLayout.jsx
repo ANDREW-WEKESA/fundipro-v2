@@ -21,6 +21,7 @@ export default function AdminLayout({ title, headerRight, children }) {
     { to: "/admin/orders",    label: "All Orders",    icon: "📋" },
     { to: "/admin/chat",      label: "Messages",      icon: "💬", badge: unread },
     { to: "/admin/support",   label: "Support Tickets", icon: "🎫", badge: openTickets },
+    { to: "/admin/audit",     label: "Audit Log",     icon: "🔍" },
   ];
 
   return <AppShell nav={NAV} title={title} headerRight={headerRight}>{children}</AppShell>;
