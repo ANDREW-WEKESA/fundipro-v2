@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { store } from "../db/store.js";
 import { JWT_SECRET, JWT_EXPIRES_IN } from "../config.js";
+import { requireAuth } from "../middleware/auth.js";
+import { auditLog } from "../lib/audit.js";
 
 const router = Router();
 
@@ -81,6 +83,21 @@ router.post("/login", (req, res) => {
   }
   const token = signToken(user);
   res.json({ token, user: publicUser(user) });
+});
+
+// POST /api/auth/change-password — authenticated fundi changes their own password
+router.post("/change-password", requireAuth, (req, res) => {
+  const { current_password, new_password } = req.body || {};
+  const full = store.get("users", (u) => u.id === req.user.id);
+  if (!full || !bcrypt.compareSync(current_password, full.password_hash)) {
+    return res.status(401).json({ error: "Current password is incorrect." });
+  }
+  if (!new_password || new_password.length < 6) {
+    return res.status(400).json({ error: "New password must be at least 6 characters." });
+  }
+  store.update("users", (u) => u.id === req.user.id, { password_hash: bcrypt.hashSync(new_password, 10) });
+  auditLog("user.password_changed", req.user, req.user, {});
+  res.json({ ok: true });
 });
 
 export default router;

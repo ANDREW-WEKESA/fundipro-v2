@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { store } from "../db/store.js";
 import { requireAuth } from "../middleware/auth.js";
 import { TIERS } from "../config.js";
+import { auditLog } from "../lib/audit.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -55,6 +56,7 @@ router.patch("/password", (req, res) => {
     return res.status(400).json({ error: "New password must be at least 6 characters." });
   }
   store.update("users", (u) => u.id === req.user.id, { password_hash: bcrypt.hashSync(new_password, 10) });
+  auditLog("user.password_changed", req.user, req.user, {});
   res.json({ ok: true });
 });
 
