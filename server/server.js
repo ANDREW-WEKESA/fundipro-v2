@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { store } from "./db/store.js";
+import { seedIfEmpty } from "./db/seed.js";
 
 import authRoutes from "./routes/auth.js";
 import jobsRoutes from "./routes/jobs.js";
@@ -16,6 +18,9 @@ import reportsRoutes from "./routes/reports.js";
 import { SUPPORT_WHATSAPP, SUPPORT_EMAIL, REPORT_INTERVAL_DAYS } from "./config.js";
 
 dotenv.config();
+
+// Auto-seed if database is empty (first deploy on Render etc.)
+seedIfEmpty();
 
 const app = express();
 app.use(cors({
