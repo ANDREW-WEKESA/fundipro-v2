@@ -18,7 +18,15 @@ import { SUPPORT_WHATSAPP, SUPPORT_EMAIL, REPORT_INTERVAL_DAYS } from "./config.
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://fundipro-v2-app.vercel.app",
+    /\.vercel\.app$/
+  ],
+  credentials: true
+}));
 // Higher limit than Express's 100kb default — product photos travel as base64
 // data URLs in this JSON-store demo (see routes/storefront.js for the real-world note).
 app.use(express.json({ limit: "12mb" }));

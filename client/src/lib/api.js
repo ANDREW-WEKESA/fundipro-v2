@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({ 
-  baseURL: import.meta.env.VITE_API_URL || "/api" 
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://fundipro-v2.onrender.com/api" : "/api")
 });
 
 api.interceptors.request.use((config) => {
