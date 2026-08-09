@@ -19,6 +19,9 @@ import Chat          from "./pages/fundi/Chat";
 import Billing       from "./pages/fundi/Billing";
 import Settings      from "./pages/fundi/Settings";
 import Support       from "./pages/fundi/Support";
+import Sales         from "./pages/fundi/Sales";
+import Expenses      from "./pages/fundi/Expenses";
+import Reports       from "./pages/fundi/Reports";
 
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminFundis   from "./pages/admin/AdminFundis";
@@ -53,6 +56,9 @@ export default function App() {
           <Route path="/app/billing"      element={F("fundi", Billing)}/>
           <Route path="/app/settings"     element={F("fundi", Settings)}/>
           <Route path="/app/support"      element={F("fundi", Support)}/>
+          <Route path="/app/sales"        element={F("fundi", Sales)}/>
+          <Route path="/app/expenses"     element={F("fundi", Expenses)}/>
+          <Route path="/app/reports"      element={F("fundi", Reports)}/>
 
           {/* Admin */}
           <Route path="/admin"            element={F("admin", AdminOverview)}/>
