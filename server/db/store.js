@@ -41,20 +41,27 @@ function load() {
 
 let db = load();
 
+// On Render/serverless, reload from disk before each read to pick up
+// any changes written by other processes or restarts.
+function freshDb() {
+  if (fs.existsSync(DATA_FILE)) {
+    try { db = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8")); } catch(e) {}
+  }
+  return db;
+}
+
 function persist() {
   fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
 }
 
 export const store = {
-  // Return every row in `table`, optionally filtered by a predicate.
   all(table, predicate) {
-    const rows = db[table] || [];
+    const rows = freshDb()[table] || [];
     return predicate ? rows.filter(predicate) : [...rows];
   },
 
-  // Return the first row matching predicate, or undefined.
   get(table, predicate) {
-    return (db[table] || []).find(predicate);
+    return (freshDb()[table] || []).find(predicate);
   },
 
   // Insert a row, auto-generating id/created_at if absent. Returns the row.

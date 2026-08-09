@@ -75,7 +75,7 @@ export default function Settings() {
     e.preventDefault(); setPwError(""); setPwSuccess(false);
     if (pwForm.new_password !== pwForm.confirm) { setPwError("New passwords do not match."); return; }
     if (pwForm.new_password.length < 6) { setPwError("Password must be at least 6 characters."); return; }
-    try { await api.patch("/users/password", { current_password: pwForm.current_password, new_password: pwForm.new_password }); setPwSuccess(true); setPwForm({ current_password:"", new_password:"", confirm:"" }); }
+    try { await api.post("/auth/change-password", { current_password: pwForm.current_password, new_password: pwForm.new_password }); setPwSuccess(true); setPwForm({ current_password:"", new_password:"", confirm:"" }); }
     catch(err) { setPwError(errMsg(err)); }
   }
 

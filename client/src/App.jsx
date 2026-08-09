@@ -29,6 +29,7 @@ import AdminOrders   from "./pages/admin/AdminOrders";
 import AdminChat     from "./pages/admin/AdminChat";
 import AdminSupport  from "./pages/admin/AdminSupport";
 import AdminAuditLog from "./pages/admin/AdminAuditLog";
+import AdminSettings  from "./pages/admin/AdminSettings";
 
 const F = (role, El) => <ProtectedRoute role={role}><El/></ProtectedRoute>;
 
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="/admin/chat"       element={F("admin", AdminChat)}/>
           <Route path="/admin/support"    element={F("admin", AdminSupport)}/>
           <Route path="/admin/audit"      element={F("admin", AdminAuditLog)}/>
+          <Route path="/admin/settings"   element={F("admin", AdminSettings)}/>
 
           <Route path="*" element={<Landing/>}/>
         </Routes>
