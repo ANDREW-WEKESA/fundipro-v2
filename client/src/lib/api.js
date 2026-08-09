@@ -1,8 +1,12 @@
 import axios from "axios";
 
-const api = axios.create({ 
-  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://fundipro-v2.onrender.com/api" : "/api")
-});
+// In production (Vercel), call the Render backend directly.
+// In development, use the local Vite proxy.
+const API_BASE = import.meta.env.PROD
+  ? "https://fundipro-v2.onrender.com/api"
+  : "/api";
+
+const api = axios.create({ baseURL: API_BASE });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("fundipro_token");
