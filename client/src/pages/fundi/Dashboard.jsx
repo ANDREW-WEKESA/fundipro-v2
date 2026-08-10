@@ -19,9 +19,28 @@ export default function Dashboard() {
     const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
     const to = now.toISOString().slice(0, 10);
 
-    api.get("/jobs/summary").then(({ data }) => setSummary(data));
-    api.get("/reports/status").then(({ data }) => setReportStatus(data));
-    api.get("/materials").then(({ data }) => setMaterials(data));
+    // Fetch jobs (replaces /jobs/summary which doesn't exist in Worker)
+    api.get("/jobs").then(({ data }) => {
+      const jobs = data.jobs || [];
+      const thisMonth = jobs.filter(j => j.created_at?.slice(0,7) === now.toISOString().slice(0,7));
+      setSummary({
+        this_month: {
+          jobs: thisMonth.length,
+          revenue: thisMonth.reduce((a,j) => a + (j.sale_price||0), 0),
+          profit: thisMonth.reduce((a,j) => a + (j.profit||0), 0),
+        },
+        all_time: {
+          jobs: jobs.length,
+          revenue: jobs.reduce((a,j) => a + (j.sale_price||0), 0),
+          profit: jobs.reduce((a,j) => a + (j.profit||0), 0),
+        }
+      });
+    }).catch(() => setSummary({ this_month:{jobs:0,revenue:0,profit:0}, all_time:{jobs:0,revenue:0,profit:0} }));
+
+    // report status — just skip it, set null
+    setReportStatus(null);
+
+    api.get("/materials").then(({ data }) => setMaterials(data)).catch(() => setMaterials({}));
     api.get(`/sales?from=${from}&to=${to}`).then(({ data }) => setSalesTotal(data.total_amount || 0)).catch(() => setSalesTotal(0));
     api.get(`/expenses?from=${from}&to=${to}`).then(({ data }) => setExpensesTotal(data.total_amount || 0)).catch(() => setExpensesTotal(0));
     api.get(`/reports/profit?from=${from}&to=${to}`).then(({ data }) => setProfitReport(data)).catch(() => setProfitReport(null));

@@ -40,8 +40,7 @@ export default function AdminOverview() {
 
         <div className="grid grid-cols-3 gap-4">
           {[["Free",stats.by_tier?.free||0,"fundis on the free tier",false],
-            ["Pro",stats.by_tier?.pro||0,"paying KES 500/mo",true],
-            ["Business",stats.by_tier?.business||0,"paying KES 1,200/mo",false]].map(([name,val,sub,hl]) => (
+            ["FundiPro",( (stats.by_tier?.pro||0) + (stats.by_tier?.business||0) ),"paying KES 1,200/mo",true]].map(([name,val,sub,hl]) => (
             <div key={name} className={`card ${hl ? "ring-1 ring-terracotta" : ""}`}>
               <h3 className={`font-display font-bold mb-1 ${hl ? "text-terracotta" : ""}`} style={hl ? {} : {color:"var(--ink)"}}>{name}</h3>
               <p className="font-display text-3xl font-bold" style={{color:"var(--ink)"}}>{val}</p>
