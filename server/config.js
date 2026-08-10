@@ -6,20 +6,20 @@ export const TIERS = {
     label: "Free",
     price: 0,
     jobLimitPerMonth: 3,
-    storefrontPublic: false, // can build it, but it's not publicly verified
+    storefrontPublic: false,
     clientManagement: false,
     smsReminders: false,
   },
   pro: {
-    label: "Pro",
-    price: 500,
-    jobLimitPerMonth: null, // unlimited
+    label: "FundiPro",
+    price: 1200,
+    jobLimitPerMonth: null,
     storefrontPublic: true,
-    clientManagement: false,
-    smsReminders: false,
+    clientManagement: true,
+    smsReminders: true,
   },
   business: {
-    label: "Business",
+    label: "FundiPro",
     price: 1200,
     jobLimitPerMonth: null,
     storefrontPublic: true,
