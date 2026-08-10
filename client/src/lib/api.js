@@ -1,9 +1,9 @@
 import axios from "axios";
 
-// In production (Vercel), call the Render backend directly.
+// In production (Vercel), call the Cloudflare Worker directly.
 // In development, use the local Vite proxy.
 const API_BASE = import.meta.env.PROD
-  ? "https://fundipro-v2.onrender.com/api"
+  ? "https://fundipro-api.andrewwekesa675.workers.dev/api"
   : "/api";
 
 const api = axios.create({ baseURL: API_BASE });

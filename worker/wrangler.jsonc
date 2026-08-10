@@ -1,0 +1,15 @@
+{
+  "name": "fundipro-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fundipro-db",
+      "database_id": "4464095e-fd50-4e3b-89f7-1fb47b421932",
+      "migrations_dir": "./migrations"
+    }
+  ],
+  "observability": { "enabled": true }
+}

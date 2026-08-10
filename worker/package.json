@@ -1,0 +1,16 @@
+{
+  "name": "fundipro-worker",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "migrate:local": "wrangler d1 migrations apply fundipro-db --local",
+    "migrate:remote": "wrangler d1 migrations apply fundipro-db --remote",
+    "seed:remote": "wrangler d1 execute fundipro-db --remote --file ./migrations/seed.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.105.0"
+  }
+}
