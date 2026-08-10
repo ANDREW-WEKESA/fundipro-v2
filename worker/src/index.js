@@ -1,5 +1,6 @@
 import { handleAuth } from "./routes/auth.js";
 import { handleStorefront } from "./routes/storefront.js";
+import { handleUploads } from "./routes/uploads.js";
 import { handleJobs } from "./routes/jobs.js";
 import { handleOrders } from "./routes/orders.js";
 import { handleMaterials } from "./routes/materials.js";
@@ -37,7 +38,8 @@ export default {
       }
 
       // Route dispatch
-      if (path.startsWith("/api/auth"))           return handleAuth(request, env, path);
+      if (path.startsWith("/api/uploads"))         return handleUploads(request, env, path);
+      if (path.startsWith("/api/auth"))             return handleAuth(request, env, path);
       if (path.startsWith("/api/storefront"))     return handleStorefront(request, env, path);
       if (path.startsWith("/api/jobs"))           return handleJobs(request, env, path);
       if (path.startsWith("/api/orders"))         return handleOrders(request, env, path);

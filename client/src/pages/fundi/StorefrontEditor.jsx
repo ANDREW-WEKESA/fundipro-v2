@@ -13,32 +13,14 @@ const STATUS_COLOR = {
   sold: "bg-bark text-white dark:bg-white/20",
 };
 
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+const WORKER_URL = import.meta.env.PROD
+  ? "https://fundipro-api.andrewwekesa675.workers.dev"
+  : "";
 
-// Compress image to max width and quality before sending to server
-function compressImage(file, maxWidth = 800, quality = 0.7) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const canvas = document.createElement("canvas");
-      const scale = Math.min(1, maxWidth / img.width);
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", quality));
-    };
-    img.onerror = reject;
-    img.src = url;
-  });
+function photoSrc(url) {
+  if (!url) return "";
+  if (url.startsWith("http") || url.startsWith("/images/")) return url;
+  return `${WORKER_URL}${url}`;
 }
 
 function ProductCard({ item, onChanged, onDeleted }) {
@@ -52,12 +34,21 @@ function ProductCard({ item, onChanged, onDeleted }) {
     if (files.length === 0) return;
     setBusy(true);
     try {
-      // Compress images before upload to stay within Worker/D1 limits
-      const dataUrls = await Promise.all(files.map(f => compressImage(f, 800, 0.7)));
-      const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos: [...item.photos, ...dataUrls] });
+      const uploadedUrls = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("photo", file);
+        const { data } = await api.post("/uploads/photo", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        uploadedUrls.push(data.url);
+      }
+      const { data } = await api.patch(`/storefront/me/items/${item.id}`, {
+        photos: [...item.photos, ...uploadedUrls],
+      });
       onChanged(data.item);
-    } catch(err) {
-      alert("Photo upload failed. Try a smaller image.");
+    } catch (err) {
+      alert("Photo upload failed: " + (err.response?.data?.error || err.message));
     } finally {
       setBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -112,7 +103,7 @@ function ProductCard({ item, onChanged, onDeleted }) {
       <div className="grid grid-cols-4 gap-2 mt-3">
         {item.photos.map((p, i) => (
           <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-bark/10 dark:border-white/10">
-            <img src={p} alt="" className="w-full h-full object-cover" />
+            <img src={photoSrc(p)} alt="" className="w-full h-full object-cover" />
             <button
               onClick={() => removePhoto(i)}
               className="absolute top-1 right-1 h-5 w-5 rounded-full bg-bark/70 text-white text-xs flex items-center justify-center"
