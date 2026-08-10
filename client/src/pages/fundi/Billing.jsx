@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import FundiLayout from "./FundiLayout";
 import { Banner } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
@@ -19,30 +19,26 @@ const FEATURES = [
   "Priority WhatsApp support",
 ];
 
-function StkModal({ onClose, onSuccess }) {
-  const [status, setStatus] = useState("pending");
-  const firedRef = useRef(false);
-
-  useEffect(() => {
-    if (firedRef.current) return;
-    firedRef.current = true;
-    // STK push not wired yet — show instructions to pay manually
-    setStatus("manual");
-  }, []);
-
+function PayModal({ onClose }) {
   return (
     <div className="fixed inset-0 bg-bark/60 flex items-center justify-center z-50 px-5">
       <div className="bg-white rounded-2xl p-7 max-w-sm w-full text-center shadow-card space-y-4">
         <div className="text-4xl">📱</div>
-        <h3 className="font-display font-bold text-bark text-lg">Pay via M-Pesa</h3>
+        <h3 className="font-display font-bold text-bark text-lg">Pay KES 1,200 via M-Pesa</h3>
         <div className="bg-sand/60 rounded-xl p-4 text-left space-y-2 text-sm">
-          <p className="font-semibold" style={{color:"var(--ink)"}}>Send KES 1,200 to:</p>
-          <p style={{color:"var(--ink)"}}>📞 <strong>0710435113</strong> (Andrew Wekesa)</p>
-          <p className="text-xs mt-2" style={{color:"var(--muted)"}}>Use your phone number as the M-Pesa reference so Andrew can identify your payment and activate your account.</p>
+          <p className="font-semibold" style={{color:"var(--ink)"}}>Send to:</p>
+          <p style={{color:"var(--ink)"}}>📞 <strong>0710435113</strong> — Andrew Wekesa</p>
+          <p className="text-xs mt-1" style={{color:"var(--muted)"}}>Use your phone number as the M-Pesa reference so Andrew can identify your payment.</p>
         </div>
-        <p className="text-sm" style={{color:"var(--muted)"}}>Once paid, WhatsApp Andrew on <strong>0107875549</strong> and your account will be activated within minutes.</p>
+        <p className="text-sm" style={{color:"var(--muted)"}}>After paying, tap the button below to notify Andrew. Your account will be activated within minutes.</p>
         <div className="flex gap-3">
-          <a href="https://wa.me/254107875549?text=Hi%20Andrew%2C%20I%20just%20paid%20KES%201200%20for%20FundiPro.%20My%20phone%20is%20" target="_blank" rel="noreferrer" className="btn-primary flex-1">💬 WhatsApp Andrew</a>
+          <a
+            href={`https://wa.me/254107875549?text=Hi%20Andrew%2C%20I%20just%20paid%20KES%201200%20for%20FundiPro.%20Please%20activate%20my%20account.%20My%20phone%3A%20`}
+            target="_blank" rel="noreferrer"
+            className="btn-primary flex-1 justify-center"
+          >
+            💬 Notify Andrew on WhatsApp
+          </a>
           <button className="btn-secondary flex-1" onClick={onClose}>Close</button>
         </div>
       </div>
@@ -60,7 +56,6 @@ export default function Billing() {
     api.get("/payments").then(({ data }) => setPayments(data.payments || [])).catch(() => {});
   }
   useEffect(loadPayments, []);
-
   return (
     <FundiLayout title="Billing & Plan">
       <div className="max-w-xl space-y-8">
@@ -140,9 +135,8 @@ export default function Billing() {
       </div>
 
       {showModal && (
-        <StkModal
+        <PayModal
           onClose={() => { setShowModal(false); loadPayments(); }}
-          onSuccess={() => { refreshMe(); loadPayments(); }}
         />
       )}
     </FundiLayout>

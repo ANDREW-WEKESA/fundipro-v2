@@ -35,5 +35,11 @@ export async function handleUsers(request, env, path) {
     return json({ ok: true }, 201);
   }
 
+  // GET /api/users/tickets — list own tickets
+  if (path === "/api/users/tickets" && method === "GET") {
+    const { results } = await env.DB.prepare("SELECT * FROM tickets WHERE user_id = ? ORDER BY created_at DESC").bind(user.id).all();
+    return json({ tickets: results });
+  }
+
   return json({ error: "Not found." }, 404);
 }

@@ -195,23 +195,17 @@ export default function StorefrontEditor() {
     setItems((prev) => prev.filter((i) => i.id !== id));
   }
 
-  const isPublic = tierConfig?.storefrontPublic;
+  const isPublic = true; // All fundis can have a storefront
   const publicUrl = `${window.location.origin}/s/${user?.slug}`;
 
   return (
     <FundiLayout title="Your Storefront">
       <div className="space-y-6 max-w-3xl">
-        <Banner kind={isPublic ? "success" : "warn"}>
-          {isPublic ? (
-            <>
-              Your storefront is live and verified — share it anywhere (WhatsApp, Facebook, Instagram):{" "}
-              <a href={`/s/${user.slug}`} target="_blank" rel="noreferrer" className="font-semibold underline">
-                {publicUrl}
-              </a>
-            </>
-          ) : (
-            <>You're building your storefront, but it isn't publicly verified yet — upgrade to Pro to make it live and shareable.</>
-          )}
+        <Banner kind="success">
+          Your storefront is live — share it anywhere (WhatsApp, Facebook, Instagram):{" "}
+          <a href={`/s/${user?.slug}`} target="_blank" rel="noreferrer" className="font-semibold underline">
+            {publicUrl}
+          </a>
         </Banner>
 
         <form onSubmit={saveProfile} className="card space-y-4">
