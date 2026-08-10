@@ -22,6 +22,25 @@ function fileToDataUrl(file) {
   });
 }
 
+// Compress image to max width and quality before sending to server
+function compressImage(file, maxWidth = 800, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement("canvas");
+      const scale = Math.min(1, maxWidth / img.width);
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
 function ProductCard({ item, onChanged, onDeleted }) {
   const fileInputRef = useRef(null);
   const [busy, setBusy] = useState(false);
@@ -33,9 +52,12 @@ function ProductCard({ item, onChanged, onDeleted }) {
     if (files.length === 0) return;
     setBusy(true);
     try {
-      const dataUrls = await Promise.all(files.map(fileToDataUrl));
+      // Compress images before upload to stay within Worker/D1 limits
+      const dataUrls = await Promise.all(files.map(f => compressImage(f, 800, 0.7)));
       const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos: [...item.photos, ...dataUrls] });
       onChanged(data.item);
+    } catch(err) {
+      alert("Photo upload failed. Try a smaller image.");
     } finally {
       setBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -135,13 +157,23 @@ function ProductCard({ item, onChanged, onDeleted }) {
           <div className="flex flex-wrap gap-2 mt-3">
             <button onClick={() => setEdit(true)} className="btn-secondary !text-xs !py-1.5">Edit details</button>
             {item.status === "in_progress" && (
-              <button onClick={() => setStatus("available")} disabled={busy} className="btn-primary !text-xs !py-1.5">Mark as finished</button>
+              <button onClick={() => setStatus("available")} disabled={busy} className="btn-primary !text-xs !py-1.5">✅ Mark as finished</button>
             )}
             {item.status === "available" && (
-              <button onClick={() => setStatus("in_progress")} disabled={busy} className="btn-secondary !text-xs !py-1.5">Mark as in progress</button>
+              <>
+                <button onClick={() => setStatus("reserved")} disabled={busy} className="btn-secondary !text-xs !py-1.5">🔒 Mark as reserved</button>
+                <button onClick={() => setStatus("sold")} disabled={busy} className="btn-secondary !text-xs !py-1.5">💸 Mark as sold</button>
+                <button onClick={() => setStatus("in_progress")} disabled={busy} className="btn-ghost !text-xs !py-1.5">↩ Back to in progress</button>
+              </>
             )}
             {item.status === "reserved" && (
-              <button onClick={() => setStatus("available")} disabled={busy} className="btn-secondary !text-xs !py-1.5">Release reservation</button>
+              <>
+                <button onClick={() => setStatus("available")} disabled={busy} className="btn-secondary !text-xs !py-1.5">🔓 Release reservation</button>
+                <button onClick={() => setStatus("sold")} disabled={busy} className="btn-secondary !text-xs !py-1.5">💸 Mark as sold</button>
+              </>
+            )}
+            {item.status === "sold" && (
+              <button onClick={() => setStatus("available")} disabled={busy} className="btn-secondary !text-xs !py-1.5">♻️ Relist as available</button>
             )}
           </div>
         </>
