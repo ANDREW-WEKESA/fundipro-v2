@@ -11,11 +11,5 @@
       "migrations_dir": "./migrations"
     }
   ],
-  "r2_buckets": [
-    {
-      "binding": "PHOTOS",
-      "bucket_name": "fundipro-photos"
-    }
-  ],
   "observability": { "enabled": true }
 }

@@ -18,6 +18,7 @@ import reportsRoutes from "./routes/reports.js";
 import auditRoutes from "./routes/audit.js";
 import salesRoutes from "./routes/sales.js";
 import expensesRoutes from "./routes/expenses.js";
+import uploadsRoutes from "./routes/uploads.js";
 import { SUPPORT_WHATSAPP, SUPPORT_EMAIL, REPORT_INTERVAL_DAYS } from "./config.js";
 
 dotenv.config();
@@ -61,6 +62,7 @@ app.use("/api/messages", messagesRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/expenses", expensesRoutes);
+app.use("/api/uploads", uploadsRoutes);
 
 // Centralized error fallback so a thrown error never leaks a stack trace.
 app.use((err, req, res, next) => {

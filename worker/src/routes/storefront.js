@@ -37,6 +37,22 @@ export async function handleStorefront(request, env, path) {
     return json({ item: { ...item, photos: parsePhotos(item.photos) } }, 201);
   }
 
+  // PATCH /api/storefront/me/items/:id/status  ← must be checked BEFORE the generic patch
+  const statusMatch = path.match(/^\/api\/storefront\/me\/items\/([^/]+)\/status$/);
+  if (statusMatch && method === "PATCH") {
+    const user = await requireAuth(request, env);
+    if (!user) return json({ error: "Unauthorized." }, 401);
+    const id = statusMatch[1];
+    const { status } = await request.json();
+    if (!VALID_STATUSES.includes(status)) return json({ error: "Invalid status." }, 400);
+    const completedAt = status === "available" ? new Date().toISOString() : null;
+    await env.DB.prepare("UPDATE storefront_items SET status = ?, completed_at = ?, updated_at = ? WHERE id = ? AND user_id = ?")
+      .bind(status, completedAt, new Date().toISOString(), id, user.id).run();
+    const item = await env.DB.prepare("SELECT * FROM storefront_items WHERE id = ?").bind(id).first();
+    if (!item) return json({ error: "Product not found." }, 404);
+    return json({ item: { ...item, photos: parsePhotos(item.photos) } });
+  }
+
   // PATCH /api/storefront/me/items/:id
   const patchItemMatch = path.match(/^\/api\/storefront\/me\/items\/([^/]+)$/);
   if (patchItemMatch && method === "PATCH") {
@@ -54,21 +70,6 @@ export async function handleStorefront(request, env, path) {
     fields.push("updated_at = ?"); vals.push(new Date().toISOString());
     vals.push(id); vals.push(user.id);
     await env.DB.prepare(`UPDATE storefront_items SET ${fields.join(", ")} WHERE id = ? AND user_id = ?`).bind(...vals).run();
-    const item = await env.DB.prepare("SELECT * FROM storefront_items WHERE id = ?").bind(id).first();
-    return json({ item: { ...item, photos: parsePhotos(item.photos) } });
-  }
-
-  // PATCH /api/storefront/me/items/:id/status
-  const statusMatch = path.match(/^\/api\/storefront\/me\/items\/([^/]+)\/status$/);
-  if (statusMatch && method === "PATCH") {
-    const user = await requireAuth(request, env);
-    if (!user) return json({ error: "Unauthorized." }, 401);
-    const id = statusMatch[1];
-    const { status } = await request.json();
-    if (!VALID_STATUSES.includes(status)) return json({ error: "Invalid status." }, 400);
-    const completedAt = status === "available" ? new Date().toISOString() : null;
-    await env.DB.prepare("UPDATE storefront_items SET status = ?, completed_at = ?, updated_at = ? WHERE id = ? AND user_id = ?")
-      .bind(status, completedAt, new Date().toISOString(), id, user.id).run();
     const item = await env.DB.prepare("SELECT * FROM storefront_items WHERE id = ?").bind(id).first();
     return json({ item: { ...item, photos: parsePhotos(item.photos) } });
   }

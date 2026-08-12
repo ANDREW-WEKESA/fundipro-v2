@@ -19,7 +19,7 @@ const WORKER_URL = import.meta.env.PROD
 
 function photoSrc(url) {
   if (!url) return "";
-  if (url.startsWith("http") || url.startsWith("/images/")) return url;
+  if (url.startsWith("data:") || url.startsWith("http") || url.startsWith("/images/")) return url;
   return `${WORKER_URL}${url}`;
 }
 
@@ -56,9 +56,16 @@ function ProductCard({ item, onChanged, onDeleted }) {
   }
 
   async function removePhoto(idx) {
-    const photos = item.photos.filter((_, i) => i !== idx);
-    const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos });
-    onChanged(data.item);
+    setBusy(true);
+    try {
+      const photos = item.photos.filter((_, i) => i !== idx);
+      const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos });
+      onChanged(data.item);
+    } catch (err) {
+      alert("Could not remove photo: " + (err.response?.data?.error || err.message));
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function saveDetails(e) {
@@ -68,6 +75,8 @@ function ProductCard({ item, onChanged, onDeleted }) {
       const { data } = await api.patch(`/storefront/me/items/${item.id}`, form);
       onChanged(data.item);
       setEdit(false);
+    } catch (err) {
+      alert("Could not save changes: " + (err.response?.data?.error || err.message));
     } finally {
       setBusy(false);
     }
@@ -78,6 +87,8 @@ function ProductCard({ item, onChanged, onDeleted }) {
     try {
       const { data } = await api.patch(`/storefront/me/items/${item.id}/status`, { status });
       onChanged(data.item);
+    } catch (err) {
+      alert("Could not update status: " + (err.response?.data?.error || err.message));
     } finally {
       setBusy(false);
     }
