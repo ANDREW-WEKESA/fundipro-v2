@@ -45,10 +45,12 @@ function ProductCard({ item, onChanged, onDeleted }) {
     try {
       // Compress images before upload to stay within Worker/D1 limits (400px width, 60% quality)
       const dataUrls = await Promise.all(files.map(f => compressImage(f, 400, 0.6)));
+      console.log("Uploading photos, total size:", JSON.stringify([...item.photos, ...dataUrls]).length, "bytes");
       const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos: [...item.photos, ...dataUrls] });
       onChanged(data.item);
     } catch(err) {
-      alert("Photo upload failed. Try a smaller image.");
+      console.error("Photo upload error:", err);
+      alert("Photo upload failed: " + (err.response?.data?.error || err.message));
     } finally {
       setBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -56,9 +58,17 @@ function ProductCard({ item, onChanged, onDeleted }) {
   }
 
   async function removePhoto(idx) {
-    const photos = item.photos.filter((_, i) => i !== idx);
-    const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos });
-    onChanged(data.item);
+    setBusy(true);
+    try {
+      const photos = item.photos.filter((_, i) => i !== idx);
+      const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos });
+      onChanged(data.item);
+    } catch(err) {
+      console.error("Remove photo error:", err);
+      alert("Remove photo failed: " + (err.response?.data?.error || err.message));
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function saveDetails(e) {
@@ -68,6 +78,9 @@ function ProductCard({ item, onChanged, onDeleted }) {
       const { data } = await api.patch(`/storefront/me/items/${item.id}`, form);
       onChanged(data.item);
       setEdit(false);
+    } catch(err) {
+      console.error("Save details error:", err);
+      alert("Save failed: " + (err.response?.data?.error || err.message));
     } finally {
       setBusy(false);
     }
@@ -78,6 +91,9 @@ function ProductCard({ item, onChanged, onDeleted }) {
     try {
       const { data } = await api.patch(`/storefront/me/items/${item.id}/status`, { status });
       onChanged(data.item);
+    } catch(err) {
+      console.error("Status update error:", err);
+      alert("Status update failed: " + (err.response?.data?.error || err.message));
     } finally {
       setBusy(false);
     }
