@@ -36,11 +36,13 @@ function ProductCard({ item, onChanged, onDeleted }) {
     try {
       const uploadedUrls = [];
       for (const file of files) {
-        const formData = new FormData();
-        formData.append("photo", file);
-        const { data } = await api.post("/uploads/photo", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
         });
+        const { data } = await api.post("/uploads/photo", { data: base64, mime: file.type });
         uploadedUrls.push(data.url);
       }
       const { data } = await api.patch(`/storefront/me/items/${item.id}`, {

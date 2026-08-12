@@ -8,39 +8,27 @@ export async function handleUploads(request, env, path) {
   const method = request.method;
 
   // POST /api/uploads/photo
-  // Accepts multipart/form-data with a "photo" field.
-  // Converts the file to a base64 data URL and returns it.
-  // No external storage needed — the data URL is stored directly in D1.
+  // Accepts JSON: { data: "<base64>", mime: "image/jpeg" }
+  // Returns: { url: "data:<mime>;base64,<data>" }
   if (path === "/api/uploads/photo" && method === "POST") {
     const user = await requireAuth(request, env);
     if (!user) return json({ error: "Unauthorized." }, 401);
 
-    let file;
+    let body;
     try {
-      const formData = await request.formData();
-      file = formData.get("photo");
+      body = await request.json();
     } catch {
-      return json({ error: "Could not parse form data." }, 400);
+      return json({ error: "Invalid request body." }, 400);
     }
 
-    if (!file) return json({ error: "No photo provided." }, 400);
-    if (!ALLOWED_MIME.includes(file.type)) {
-      return json({ error: "Unsupported file type. Use JPEG, PNG, WebP, or GIF." }, 400);
-    }
+    const { data, mime } = body || {};
+    if (!data || typeof data !== "string") return json({ error: "Missing image data." }, 400);
+    if (!mime || !ALLOWED_MIME.includes(mime)) return json({ error: "Unsupported file type." }, 400);
 
-    const buffer = await file.arrayBuffer();
-    if (buffer.byteLength > MAX_SIZE_BYTES) {
-      return json({ error: "Image too large. Max size is 4 MB." }, 400);
-    }
+    const approxBytes = (data.length * 3) / 4;
+    if (approxBytes > MAX_SIZE_BYTES) return json({ error: "Image too large. Max 4 MB." }, 400);
 
-    // Convert to base64 data URL
-    const bytes = new Uint8Array(buffer);
-    let binary = "";
-    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-    const base64 = btoa(binary);
-    const url = `data:${file.type};base64,${base64}`;
-
-    return json({ url });
+    return json({ url: `data:${mime};base64,${data}` });
   }
 
   return json({ error: "Not found." }, 404);
