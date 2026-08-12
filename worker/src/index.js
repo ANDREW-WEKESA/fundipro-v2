@@ -53,10 +53,10 @@ export default {
       if (path.startsWith("/api/reports"))        return handleReports(request, env, path);
       if (path.startsWith("/api/payments"))       return handlePayments(request, env, path);
 
-      return json({ error: "Not found" }, 404);
+      return json({ error: "Not found", path }, 404);
     } catch (err) {
-      console.error(err);
-      return json({ error: "Something went wrong on our side." }, 500);
+      console.error("Worker error:", err);
+      return json({ error: "Something went wrong on our side.", details: err.message }, 500);
     }
   },
 };
