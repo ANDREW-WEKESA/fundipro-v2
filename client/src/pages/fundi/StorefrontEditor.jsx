@@ -13,8 +13,8 @@ const STATUS_COLOR = {
   sold: "bg-bark text-white dark:bg-white/20",
 };
 
-// Compress image aggressively to stay within D1 limits (1 MB per row, 4 photos max = ~200KB each)
-function compressImage(file, maxWidth = 400, quality = 0.6) {
+// Compress image very aggressively to stay within D1 limits - aim for ~30KB per photo
+function compressImage(file, maxWidth = 300, quality = 0.5) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -43,9 +43,17 @@ function ProductCard({ item, onChanged, onDeleted }) {
     if (files.length === 0) return;
     setBusy(true);
     try {
-      // Compress images before upload to stay within Worker/D1 limits (400px width, 60% quality)
-      const dataUrls = await Promise.all(files.map(f => compressImage(f, 400, 0.6)));
-      console.log("Uploading photos, total size:", JSON.stringify([...item.photos, ...dataUrls]).length, "bytes");
+      // Compress images before upload to stay within Worker/D1 limits (300px width, 50% quality)
+      const dataUrls = await Promise.all(files.map(f => compressImage(f, 300, 0.5)));
+      const totalSize = JSON.stringify([...item.photos, ...dataUrls]).length;
+      console.log("Uploading photos, total size:", totalSize, "bytes");
+      
+      // D1 has a 1MB row limit - warn if approaching it
+      if (totalSize > 900000) {
+        alert("Too many photos or photos too large. Please remove some photos first.");
+        return;
+      }
+      
       const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos: [...item.photos, ...dataUrls] });
       onChanged(data.item);
     } catch(err) {
@@ -220,9 +228,14 @@ export default function StorefrontEditor() {
   async function addItem(e) {
     e.preventDefault();
     if (!newItem.title) return;
-    const { data } = await api.post("/storefront/me/items", newItem);
-    setItems((prev) => [data.item, ...prev]);
-    setNewItem({ title: "", description: "", cash_price: "", hp_price: "" });
+    try {
+      const { data } = await api.post("/storefront/me/items", newItem);
+      setItems((prev) => [data.item, ...prev]);
+      setNewItem({ title: "", description: "", cash_price: "", hp_price: "" });
+    } catch(err) {
+      console.error("Add item error:", err);
+      alert("Failed to add item: " + (err.response?.data?.error || err.message));
+    }
   }
 
   function updateItem(updated) {
