@@ -13,14 +13,23 @@ const STATUS_COLOR = {
   sold: "bg-bark text-white dark:bg-white/20",
 };
 
-const WORKER_URL = import.meta.env.PROD
-  ? "https://fundipro-api.andrewwekesa675.workers.dev"
-  : "";
-
-function photoSrc(url) {
-  if (!url) return "";
-  if (url.startsWith("data:") || url.startsWith("http") || url.startsWith("/images/")) return url;
-  return `${WORKER_URL}${url}`;
+// Compress image to max width and quality before sending to server
+function compressImage(file, maxWidth = 800, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement("canvas");
+      const scale = Math.min(1, maxWidth / img.width);
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
 }
 
 function ProductCard({ item, onChanged, onDeleted }) {
@@ -34,23 +43,12 @@ function ProductCard({ item, onChanged, onDeleted }) {
     if (files.length === 0) return;
     setBusy(true);
     try {
-      const uploadedUrls = [];
-      for (const file of files) {
-        const base64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-        const { data } = await api.post("/uploads/photo", { data: base64, mime: file.type });
-        uploadedUrls.push(data.url);
-      }
-      const { data } = await api.patch(`/storefront/me/items/${item.id}`, {
-        photos: [...item.photos, ...uploadedUrls],
-      });
+      // Compress images before upload to stay within Worker/D1 limits
+      const dataUrls = await Promise.all(files.map(f => compressImage(f, 800, 0.7)));
+      const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos: [...item.photos, ...dataUrls] });
       onChanged(data.item);
-    } catch (err) {
-      alert("Photo upload failed: " + (err.response?.data?.error || err.message));
+    } catch(err) {
+      alert("Photo upload failed. Try a smaller image.");
     } finally {
       setBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -58,16 +56,9 @@ function ProductCard({ item, onChanged, onDeleted }) {
   }
 
   async function removePhoto(idx) {
-    setBusy(true);
-    try {
-      const photos = item.photos.filter((_, i) => i !== idx);
-      const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos });
-      onChanged(data.item);
-    } catch (err) {
-      alert("Could not remove photo: " + (err.response?.data?.error || err.message));
-    } finally {
-      setBusy(false);
-    }
+    const photos = item.photos.filter((_, i) => i !== idx);
+    const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos });
+    onChanged(data.item);
   }
 
   async function saveDetails(e) {
@@ -77,8 +68,6 @@ function ProductCard({ item, onChanged, onDeleted }) {
       const { data } = await api.patch(`/storefront/me/items/${item.id}`, form);
       onChanged(data.item);
       setEdit(false);
-    } catch (err) {
-      alert("Could not save changes: " + (err.response?.data?.error || err.message));
     } finally {
       setBusy(false);
     }
@@ -89,8 +78,6 @@ function ProductCard({ item, onChanged, onDeleted }) {
     try {
       const { data } = await api.patch(`/storefront/me/items/${item.id}/status`, { status });
       onChanged(data.item);
-    } catch (err) {
-      alert("Could not update status: " + (err.response?.data?.error || err.message));
     } finally {
       setBusy(false);
     }
@@ -116,7 +103,7 @@ function ProductCard({ item, onChanged, onDeleted }) {
       <div className="grid grid-cols-4 gap-2 mt-3">
         {item.photos.map((p, i) => (
           <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-bark/10 dark:border-white/10">
-            <img src={photoSrc(p)} alt="" className="w-full h-full object-cover" />
+            <img src={p} alt="" className="w-full h-full object-cover" />
             <button
               onClick={() => removePhoto(i)}
               className="absolute top-1 right-1 h-5 w-5 rounded-full bg-bark/70 text-white text-xs flex items-center justify-center"
