@@ -13,8 +13,8 @@ const STATUS_COLOR = {
   sold: "bg-bark text-white dark:bg-white/20",
 };
 
-// Compress image to max width and quality before sending to server
-function compressImage(file, maxWidth = 800, quality = 0.7) {
+// Compress image aggressively to stay within D1 limits (1 MB per row, 4 photos max = ~200KB each)
+function compressImage(file, maxWidth = 400, quality = 0.6) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -43,8 +43,8 @@ function ProductCard({ item, onChanged, onDeleted }) {
     if (files.length === 0) return;
     setBusy(true);
     try {
-      // Compress images before upload to stay within Worker/D1 limits
-      const dataUrls = await Promise.all(files.map(f => compressImage(f, 800, 0.7)));
+      // Compress images before upload to stay within Worker/D1 limits (400px width, 60% quality)
+      const dataUrls = await Promise.all(files.map(f => compressImage(f, 400, 0.6)));
       const { data } = await api.patch(`/storefront/me/items/${item.id}`, { photos: [...item.photos, ...dataUrls] });
       onChanged(data.item);
     } catch(err) {
