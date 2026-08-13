@@ -4,3 +4,6 @@ dist/
 *.log
 shots/
 qa_shots.py
+
+.vercel
+.env*

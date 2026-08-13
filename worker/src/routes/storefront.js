@@ -25,14 +25,15 @@ export async function handleStorefront(request, env, path) {
   if (path === "/api/storefront/me/items" && method === "POST") {
     const user = await requireAuth(request, env);
     if (!user) return json({ error: "Unauthorized." }, 401);
-    const { title, description, cash_price, hp_price, photos, status } = await request.json();
+    const { title, description, cash_price, hp_price, photos, status, category } = await request.json();
     if (!title) return json({ error: "Item title is required." }, 400);
     const id = nanoid();
     const photosJson = JSON.stringify(Array.isArray(photos) ? photos.slice(0, 4) : []);
     const itemStatus = VALID_STATUSES.includes(status) ? status : "in_progress";
+    const itemCategory = category || "General";
     await env.DB.prepare(
-      `INSERT INTO storefront_items (id,user_id,title,description,cash_price,hp_price,photos,status) VALUES (?,?,?,?,?,?,?,?)`
-    ).bind(id, user.id, title, description || "", Number(cash_price) || 0, Number(hp_price) || 0, photosJson, itemStatus).run();
+      `INSERT INTO storefront_items (id,user_id,title,description,cash_price,hp_price,photos,status,category) VALUES (?,?,?,?,?,?,?,?,?)`
+    ).bind(id, user.id, title, description || "", Number(cash_price) || 0, Number(hp_price) || 0, photosJson, itemStatus, itemCategory).run();
     const item = await env.DB.prepare("SELECT * FROM storefront_items WHERE id = ?").bind(id).first();
     return json({ item: { ...item, photos: parsePhotos(item.photos) } }, 201);
   }
@@ -66,6 +67,7 @@ export async function handleStorefront(request, env, path) {
     if (body.cash_price !== undefined) { fields.push("cash_price = ?"); vals.push(Number(body.cash_price)); }
     if (body.hp_price !== undefined) { fields.push("hp_price = ?"); vals.push(Number(body.hp_price)); }
     if (body.photos !== undefined) { fields.push("photos = ?"); vals.push(JSON.stringify(Array.isArray(body.photos) ? body.photos.slice(0, 4) : [])); }
+    if (body.category !== undefined) { fields.push("category = ?"); vals.push(body.category); }
     if (!fields.length) return json({ error: "Nothing to update." }, 400);
     fields.push("updated_at = ?"); vals.push(new Date().toISOString());
     vals.push(id); vals.push(user.id);

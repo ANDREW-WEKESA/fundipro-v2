@@ -1,0 +1,322 @@
+[1mdiff --git a/client/src/pages/fundi/Dashboard.jsx b/client/src/pages/fundi/Dashboard.jsx[m
+[1mindex d26787f..11ccc0f 100644[m
+[1m--- a/client/src/pages/fundi/Dashboard.jsx[m
+[1m+++ b/client/src/pages/fundi/Dashboard.jsx[m
+[36m@@ -1,201 +1,802 @@[m
+[31m-import { useEffect, useState } from "react";[m
+[31m-import { Link } from "react-router-dom";[m
+[31m-import FundiLayout from "./FundiLayout";[m
+[31m-import { StatCard, Spinner, Banner, MotivationalQuote } from "../../components/ui";[m
+[31m-import { useAuth } from "../../context/AuthContext";[m
+[31m-import api from "../../lib/api";[m
+[31m-[m
+[31m-export default function Dashboard() {[m
+[31m-  const { user, tierConfig } = useAuth();[m
+[31m-  const [summary, setSummary] = useState(null);[m
+[31m-  const [reportStatus, setReportStatus] = useState(null);[m
+[31m-  const [materials, setMaterials] = useState(null);[m
+[31m-  const [salesTotal, setSalesTotal] = useState(null);[m
+[31m-  const [expensesTotal, setExpensesTotal] = useState(null);[m
+[31m-  const [profitReport, setProfitReport] = useState(null);[m
+[32m+[m[32mimport { useEffect, useState, useRef } from 'react';[m
+[32m+[m[32mimport { useNavigate } from 'react-router-dom';[m
+[32m+[m[32mimport {[m
+[32m+[m[32m  LayoutDashboard, Calculator, Briefcase, Users, DollarSign, LogOut,[m
+[32m+[m[32m  Plus, Trash2, Copy, CheckCheck, Store, Wrench, Package, Star,[m
+[32m+[m[32m  ExternalLink, Edit2, X, CreditCard, Banknote, ShoppingBag,[m
+[32m+[m[32m  Clock, CheckCircle2, XCircle, AlertCircle, RefreshCw, ImagePlus, Loader2,[m
+[32m+[m[32m  Receipt, BarChart2, Settings, Tag, Menu,[m
+[32m+[m[32m} from 'lucide-react';[m
+[32m+[m[32mimport { LogoFull } from '../../components/Logo';[m
+[32m+[m[32mimport Jobs from './Jobs';[m
+[32m+[m[32mimport Expenses from './Expenses';[m
+[32m+[m[32mimport Reports from './Reports';[m
+[32m+[m[32mimport FundiSettings from './Settings';[m
+[32m+[m[32mimport Services from './Services';[m
+ [m
+[31m-  useEffect(() => {[m
+[31m-    const now = new Date();[m
+[31m-    const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;[m
+[31m-    const to = now.toISOString().slice(0, 10);[m
+[31m-[m
+[31m-    // Fetch jobs (replaces /jobs/summary which doesn't exist in Worker)[m
+[31m-    api.get("/jobs").then(({ data }) => {[m
+[31m-      const jobs = data.jobs || [];[m
+[31m-      const thisMonth = jobs.filter(j => j.created_at?.slice(0,7) === now.toISOString().slice(0,7));[m
+[31m-      setSummary({[m
+[31m-        this_month: {[m
+[31m-          jobs: thisMonth.length,[m
+[31m-          revenue: thisMonth.reduce((a,j) => a + (j.sale_price||0), 0),[m
+[31m-          profit: thisMonth.reduce((a,j) => a + (j.profit||0), 0),[m
+[31m-        },[m
+[31m-        all_time: {[m
+[31m-          jobs: jobs.length,[m
+[31m-          revenue: jobs.reduce((a,j) => a + (j.sale_price||0), 0),[m
+[31m-          profit: jobs.reduce((a,j) => a + (j.profit||0), 0),[m
+[31m-        }[m
+[31m-      });[m
+[31m-    }).catch(() => setSummary({ this_month:{jobs:0,revenue:0,profit:0}, all_time:{jobs:0,revenue:0,profit:0} }));[m
+[31m-[m
+[31m-    // report status — just skip it, set null[m
+[31m-    setReportStatus(null);[m
+[31m-[m
+[31m-    api.get("/materials").then(({ data }) => setMaterials(data)).catch(() => setMaterials({}));[m
+[31m-    api.get(`/sales?from=${from}&to=${to}`).then(({ data }) => setSalesTotal(data.total_amount || 0)).catch(() => setSalesTotal(0));[m
+[31m-    api.get(`/expenses?from=${from}&to=${to}`).then(({ data }) => setExpensesTotal(data.total_amount || 0)).catch(() => setExpensesTotal(0));[m
+[31m-    api.get(`/reports/profit?from=${from}&to=${to}`).then(({ data }) => setProfitReport(data)).catch(() => setProfitReport(null));[m
+[31m-  }, []);[m
+[31m-[m
+[31m-  if (!summary) return <FundiLayout title="Overview"><Spinner/></FundiLayout>;[m
+[31m-[m
+[31m-  const jobsLeft = tierConfig?.jobLimitPerMonth != null[m
+[31m-    ? Math.max(tierConfig.jobLimitPerMonth - (user.jobs_count_this_month || 0), 0)[m
+[31m-    : null;[m
+[31m-  const lowStockCount = materials?.low_stock_count || 0;[m
+[31m-  const tierLabel = { free: "Free", pro: "Pro", business: "Business" }[user.tier] || user.tier;[m
+[31m-  const tierStatusOk = user.tier_status === "active";[m
+[32m+[m[32mconst API = import.meta.env.VITE_API_URL || window.location.origin + '/api';[m
+[32m+[m[32m// Cloudinary unsigned upload — FundiPro's own account[m
+[32m+[m[32mconst CLOUDINARY_URL  = 'https://api.cloudinary.com/v1_1/o9trurp7/image/upload';[m
+[32m+[m[32mconst CLOUDINARY_PRESET = 'fundipro_uploads';[m
+[32m+[m
+[32m+[m[32m/* ── status config ─────────────────────────────────────────── */[m
+[32m+[m[32mconst PRODUCT_STATUSES = {[m
+[32m+[m[32m  in_stock:    { label: 'In Stock',    bg: 'bg-green-100',  text: 'text-green-700',  dot: 'bg-green-500'  },[m
+[32m+[m[32m  on_sale:     { label: 'On Sale',     bg: 'bg-blue-100',   text: 'text-blue-700',   dot: 'bg-blue-500'   },[m
+[32m+[m[32m  booked:      { label: 'Booked',      bg: 'bg-amber-100',  text: 'text-amber-700',  dot: 'bg-amber-500'  },[m
+[32m+[m[32m  out_of_stock:{ label: 'Out of Stock',bg: 'bg-red-100',    text: 'text-red-600',    dot: 'bg-red-500'    },[m
+[32m+[m[32m  sold:        { label: 'Sold',        bg: 'bg-gray-100',   text: 'text-gray-500',   dot: 'bg-gray-400'   },[m
+[32m+[m[32m};[m
+[32m+[m[32mconst ORDER_STATUSES = {[m
+[32m+[m[32m  pending:     { label: 'Pending',     bg: 'bg-amber-100',  text: 'text-amber-700',  icon: AlertCircle   },[m
+[32m+[m[32m  in_progress: { label: 'In Progress', bg: 'bg-blue-100',   text: 'text-blue-700',   icon: RefreshCw     },[m
+[32m+[m[32m  done:        { label: 'Done',        bg: 'bg-green-100',  text: 'text-green-700',  icon: CheckCircle2  },[m
+[32m+[m[32m  cancelled:   { label: 'Cancelled',   bg: 'bg-red-100',    text: 'text-red-600',    icon: XCircle       },[m
+[32m+[m[32m};[m
+ [m
+[32m+[m[32mfunction StatusBadge({ status, type = 'product' }) {[m
+[32m+[m[32m  const map = type === 'product' ? PRODUCT_STATUSES : ORDER_STATUSES;[m
+[32m+[m[32m  const s   = map[status] || map.in_stock || map.pending;[m
+[32m+[m[32m  const Icon = s.icon;[m
+   return ([m
+[31m-    <FundiLayout title={`Habari, ${user.name?.split(" ")[0]} 👋`}>[m
+[31m-      <div className="space-y-6 max-w-5xl">[m
+[31m-[m
+[31m-        {/* Tier limit warning */}[m
+[31m-        {user.tier === "free" && jobsLeft === 0 && ([m
+[31m-          <Banner kind="warn">[m
+[31m-            You've used all 3 free jobs this month.{" "}[m
+[31m-            <Link to="/app/billing" className="font-bold underline">Upgrade to Pro</Link> for unlimited jobs + a public storefront that gets you new clients.[m
+[31m-          </Banner>[m
+[31m-        )}[m
+[32m+[m[32m    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${s.bg} ${s.text}`}>[m
+[32m+[m[32m      {type === 'product' ? <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} /> : Icon ? <Icon size={11} /> : null}[m
+[32m+[m[32m      {s.label}[m
+[32m+[m[32m    </span>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m/* ── tiny helpers ─────────────────────────────────────────── */[m
+[32m+[m[32mfunction KpiCard({ label, value, accent }) {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <div className={`rounded-xl border p-4 ${accent ? 'bg-[#0d7c6e] border-[#0d7c6e]' : 'bg-white border-gray-200'}`}>[m
+[32m+[m[32m      <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${accent ? 'text-teal-100' : 'text-gray-400'}`}>{label}</p>[m
+[32m+[m[32m      <p className={`text-2xl font-bold ${accent ? 'text-white' : 'text-[#0d7c6e]'}`}>{value}</p>[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[32m+[m[32mfunction SideBtn({ icon: Icon, label, active, onClick, badge }) {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <button onClick={onClick}[m
+[32m+[m[32m      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition[m
+[32m+[m[32m        ${active ? 'bg-[#0d7c6e] text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white'}`}>[m
+[32m+[m[32m      <Icon size={18} /><span className="flex-1 text-left">{label}</span>[m
+[32m+[m[32m      {badge > 0 && <span className="text-xs bg-amber-500 text-white px-1.5 py-0.5 rounded-full">{badge}</span>}[m
+[32m+[m[32m    </button>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[32m+[m[32mfunction NavBtn({ icon: Icon, label, active, onClick, badge }) {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <button onClick={onClick}[m
+[32m+[m[32m      className={`relative flex flex-col items-center gap-0.5 px-3 py-2 text-xs font-medium transition[m
+[32m+[m[32m        ${active ? 'text-[#0d7c6e]' : 'text-gray-400 hover:text-gray-600'}`}>[m
+[32m+[m[32m      <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />[m
+[32m+[m[32m      <span>{label}</span>[m
+[32m+[m[32m      {badge > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-amber-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{badge}</span>}[m
+[32m+[m[32m    </button>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[32m+[m[32mfunction Field({ label, children, required }) {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <div>[m
+[32m+[m[32m      <label className="block text-xs font-semibold text-gray-600 mb-1.5">[m
+[32m+[m[32m        {label}{required && <span className="text-red-400 ml-0.5">*</span>}[m
+[32m+[m[32m      </label>[m
+[32m+[m[32m      {children}[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[32m+[m[32m/* ── Photo Upload Box ─────────────────────────────────────── */[m
+[32m+[m[32mfunction PhotoUpload({ value, onChange }) {[m
+[32m+[m[32m  const [uploading, setUploading] = useState(false);[m
+[32m+[m[32m  const [dragOver,  setDragOver]  = useState(false);[m
+[32m+[m[32m  const [error,     setError]     = useState('');[m
+[32m+[m[32m  const fileRef = useRef();[m
+[32m+[m
+[32m+[m[32m  async function upload(file) {[m
+[32m+[m[32m    if (!file || !file.type.startsWith('image/')) { setError('Please select an image file'); return; }[m
+[32m+[m[32m    if (file.size > 5 * 1024 * 1024) { setError('Image must be under 5MB'); return; }[m
+[32m+[m[32m    setUploading(true); setError('');[m
+[32m+[m[32m    try {[m
+[32m+[m[32m      const fd = new FormData();[m
+[32m+[m[32m      fd.append('file', file);[m
+[32m+[m[32m      fd.append('upload_preset', CLOUDINARY_PRESET);[m
+[32m+[m[32m      const res  = await fetch(CLOUDINARY_URL, { method: 'POST', body: fd });[m
+[32m+[m[32m      const data = await res.json();[m
+[32m+[m[32m      if (data.secure_url) onChange(data.secure_url);[m
+[32m+[m[32m      else setError('Upload failed — try a URL instead');[m
+[32m+[m[32m    } catch {[m
+[32m+[m[32m      setError('Upload failed — check connection');[m
+[32m+[m[32m    } finally { setUploading(false); }[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  function onDrop(e) {[m
+[32m+[m[32m    e.preventDefault(); setDragOver(false);[m
+[32m+[m[32m    const file = e.dataTransfer.files[0];[m
+[32m+[m[32m    if (file) upload(file);[m
+[32m+[m[32m  }[m
+ [m
+[31m-        {/* 20-day report due */}[m
+[31m-        {reportStatus?.due && ([m
+[31m-          <Banner kind="info">[m
+[31m-            📄 Your 20-day business statement is ready.{" "}[m
+[31m-            <Link to="/app/stats" className="font-bold underline">Download it now →</Link>[m
+[31m-          </Banner>[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <div className="space-y-2">[m
+[32m+[m[32m      {/* Upload rectangle */}[m
+[32m+[m[32m      <div[m
+[32m+[m[32m        onDragOver={e=>{ e.preventDefault(); setDragOver(true); }}[m
+[32m+[m[32m        onDragLeave={()=>setDragOver(false)}[m
+[32m+[m[32m        onDrop={onDrop}[m
+[32m+[m[32m        onClick={()=>!uploading && fileRef.current.click()}[m
+[32m+[m[32m        className={`relative border-2 border-dashed rounded-2xl cursor-pointer transition overflow-hidden[m
+[32m+[m[32m          ${dragOver ? 'border-[#0d7c6e] bg-teal-50' : 'border-gray-300 hover:border-[#0d7c6e] hover:bg-gray-50'}[m
+[32m+[m[32m          ${uploading ? 'pointer-events-none' : ''}`}[m
+[32m+[m[32m        style={{ minHeight: 160 }}[m
+[32m+[m[32m      >[m
+[32m+[m[32m        {value ? ([m
+[32m+[m[32m          /* Preview */[m
+[32m+[m[32m          <div className="relative w-full h-40">[m
+[32m+[m[32m            <img src={value} alt="Product" className="w-full h-full object-cover"/>[m
+[32m+[m[32m            <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition">[m
+[32m+[m[32m              <p className="text-white text-xs font-semibold">Click to change</p>[m
+[32m+[m[32m            </div>[m
+[32m+[m[32m            <button[m
+[32m+[m[32m              type="button"[m
+[32m+[m[32m              onClick={e=>{ e.stopPropagation(); onChange(''); }}[m
+[32m+[m[32m              className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition z-10"[m
+[32m+[m[32m            >[m
+[32m+[m[32m              <X size={13}/>[m
+[32m+[m[32m            </button>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m        ) : ([m
+[32m+[m[32m          /* Empty state */[m
+[32m+[m[32m          <div className="flex flex-col items-center justify-center py-10 px-4 text-center gap-3">[m
+[32m+[m[32m            {uploading ? ([m
+[32m+[m[32m              <>[m
+[32m+[m[32m                <Loader2 size={32} className="text-[#0d7c6e] animate-spin"/>[m
+[32m+[m[32m                <p className="text-sm text-[#0d7c6e] font-medium">Uploading…</p>[m
+[32m+[m[32m              </>[m
+[32m+[m[32m            ) : ([m
+[32m+[m[32m              <>[m
+[32m+[m[32m                <div className="w-14 h-14 rounded-2xl bg-teal-50 border-2 border-teal-200 flex items-center justify-center">[m
+[32m+[m[32m                  <ImagePlus size={24} className="text-[#0d7c6e]"/>[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m                <div>[m
+[32m+[m[32m                  <p className="text-sm font-semibold text-gray-700">Click or drag photo here</p>[m
+[32m+[m[32m                  <p className="text-xs text-gray-400 mt-0.5">JPG, PNG, WEBP · max 5MB</p>[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m              </>[m
+[32m+[m[32m            )}[m
+[32m+[m[32m          </div>[m
+         )}[m
+[32m+[m[32m      </div>[m
+[32m+[m
+[32m+[m[32m      {/* Hidden file input */}[m
+[32m+[m[32m      <input ref={fileRef} type="file" accept="image/*" className="hidden"[m
+[32m+[m[32m        onChange={e=>{ const f=e.target.files[0]; if(f) upload(f); e.target.value=''; }}/>[m
+[32m+[m
+[32m+[m[32m      {/* OR paste URL */}[m
+[32m+[m[32m      <div className="flex items-center gap-2">[m
+[32m+[m[32m        <div className="flex-1 h-px bg-gray-200"/>[m
+[32m+[m[32m        <span className="text-xs text-gray-400">or paste URL</span>[m
+[32m+[m[32m        <div className="flex-1 h-px bg-gray-200"/>[m
+[32m+[m[32m      </div>[m
+[32m+[m[32m      <input[m
+[32m+[m[32m        className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-[#0d7c6e] text-gray-500"[m
+[32m+[m[32m        value={value || ''}[m
+[32m+[m[32m        onChange={e=>onChange(e.target.value)}[m
+[32m+[m[32m        placeholder="https://…/photo.jpg"[m
+[32m+[m[32m      />[m
+[32m+[m[32m      {error && <p className="text-xs text-red-500">{error}</p>}[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction ModeToggle({ mode, onChange }) {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <div className="flex items-center bg-white/15 rounded-xl p-1 gap-1">[m
+[32m+[m[32m      <button onClick={() => onChange('workspace')}[m
+[32m+[m[32m        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition[m
+[32m+[m[32m          ${mode === 'workspace' ? 'bg-white text-[#0d7c6e]' : 'text-white/80 hover:text-white'}`}>[m
+[32m+[m[32m        <Wrench size={12} /> Workspace[m
+[32m+[m[32m      </button>[m
+[32m+[m[32m      <button onClick={() => onChange('storefront')}[m
+[32m+[m[32m        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition[m
+[32m+[m[32m          ${mode === 'storefront' ? 'bg-white text-[#c9a84c]' : 'text-white/80 hover:text-white'}`}>[m
+[32m+[m[32m        <Store size={12} /> Storefront[m
+[32m+[m[32m      </button>[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mconst inp = 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#0d7c6e] bg-white';[m
+[32m+[m[32mconst EMPTY_P = { name:'', description:'', category:'', price:'', stock_quantity:'',[m
+[32m+[m[32m  status:'in_stock', completion_days:'', photo_url:'',[m
+[32m+[m[32m  hire_purchase_enabled:false, deposit_amount:'', installment_amount:'', installment_months:'3', installment_note:'' };[m
+[32m+[m
+[32m+[m[32m/* ── Product Form ─────────────────────────────────────────── */[m
+[32m+[m[32mfunction ProductForm({ initial, onSave, onCancel, saving }) {[m
+[32m+[m[32m  const [form, setForm] = useState(initial ? {[m
+[32m+[m[32m    ...EMPTY_P, ...initial,[m
+[32m+[m[32m    hire_purchase_enabled: !!initial.hire_purchase_enabled,[m
+[32m+[m[32m  } : EMPTY_P);[m
+[32m+[m[32m  const set = (k,v) => setForm(f => ({...f,[k]:v}));[m
+[32m+[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-4">[m
+[32m+[m[32m      <div className="flex items-center justify-between">[m
+[32m+[m[32m        <h3 className="font-bold text-gray-900">{initial?.id ? 'Edit Product' : 'New Product'}</h3>[m
+[32m+[m[32m        <button onClick={onCancel} className="text-gray-400 hover:text-gray-600"><X size={18}/></button>[m
+[32m+[m[32m      </div>[m
+[32m+[m
+[32m+[m[32m      {/* Photo */}[m
+[32m+[m[32m      <Field label="Product Photo">[m
+[32m+[m[32m        <PhotoUpload value={form.photo_url} onChange={v => set('photo_url', v)} />[m
+[32m+[m[32m      </Field>[m
+ [m
+[31m-        {/* Low stock alert */}[m
+[31m-        {lowStockCount > 0 && ([m
+[31m-          <Banner kind="warn">[m
+[31m-            ⚠️ {lowStockCount} {lowStockCount === 1 ? "material is" : "materials are"} running low in your tools store.{" "}[m
+[31m-            <Link to="/app/materials" className="font-bold underline">Restock now →</Link>[m
+[31m-          </Banner>[m
+[32m+[m[32m      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">[m
+[32m+[m[32m        <Field label="Product Name" required><input className={inp} value={form.name} onChange={e=>set('name',e.target.value)} placeholder="e.g. Oak Dining Table" /></Field>[m
+[32m+[m[32m        <Field label="Category"><input className={inp} value={form.category} onChange={e=>set('category',e.target.value)} placeholder="e.g. Furniture" /></Field>[m
+[32m+[m[32m      </div>[m
+[32m+[m[32m      <Field label="Description"><textarea className={inp} rows={2} value={form.description} onChange={e=>set('description',e.target.value)} placeholder="Materials, size, finish…" /></Field>[m
+[32m+[m
+[32m+[m[32m      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">[m
+[32m+[m[32m        <Field label="Cash Price (KES)" required><input type="number" className={inp} value={form.price} onChange={e=>set('price',e.target.value)} /></Field>[m

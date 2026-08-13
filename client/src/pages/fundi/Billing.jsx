@@ -37,7 +37,7 @@ function PayModal({ onClose }) {
             target="_blank" rel="noreferrer"
             className="btn-primary flex-1 justify-center"
           >
-            💬 Notify Andrew on WhatsApp
+            💬 Contact Support on WhatsApp
           </a>
           <button className="btn-secondary flex-1" onClick={onClose}>Close</button>
         </div>

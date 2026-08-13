@@ -42,8 +42,8 @@ export default function Messages() {
     <FundiLayout title="Messages">
       <div className="card !p-0 flex flex-col h-[70vh] max-w-2xl">
         <div className="px-5 py-3 border-b border-bark/10 dark:border-white/10">
-          <p className="font-display font-bold text-bark dark:text-sand text-sm">Chat with Andrew (FundiPro)</p>
-          <p className="text-xs text-muted dark:text-sand/50">Direct line to the founder — plus daily reminders to keep your records honest and up to date.</p>
+          <p className="font-display font-bold text-bark dark:text-sand text-sm">Support Chat</p>
+          <p className="text-xs text-muted dark:text-sand/50">Direct line to support — plus daily reminders to keep your records honest and up to date.</p>
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
           {messages === null ? (

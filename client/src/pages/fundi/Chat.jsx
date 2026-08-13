@@ -34,7 +34,7 @@ export default function Chat() {
   }
 
   return (
-    <FundiLayout title="Chat with Andrew">
+    <FundiLayout title="Support Chat">
       <div className="max-w-2xl flex flex-col" style={{height:"calc(100vh - 140px)"}}>
         {/* Info bar */}
         <div className="card mb-3 flex items-center gap-3 py-3">

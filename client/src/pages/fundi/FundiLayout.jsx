@@ -26,7 +26,7 @@ export default function FundiLayout({ title, headerRight, children }) {
     { to: "/app/materials",label: "Tools & Materials", icon: "📦", badge: lowStock },
     { to: "/app/stats",    label: "Statistics",     icon: "📉" },
     { to: "/app/storefront", label: "Storefront",   icon: "🏪" },
-    { to: "/app/chat",     label: "Chat with Andrew", icon: "💬", badge: unreadMessages },
+    { to: "/app/chat",     label: "Support Chat", icon: "💬", badge: unreadMessages },
     { to: "/app/billing",  label: "Billing & Plan", icon: "💳" },
     { to: "/app/settings", label: "Settings",       icon: "⚙️" },
   ];
