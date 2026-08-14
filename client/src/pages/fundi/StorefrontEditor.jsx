@@ -248,7 +248,8 @@ export default function StorefrontEditor() {
   }
 
   const isPublic = true; // All fundis can have a storefront
-  const publicUrl = `${window.location.origin}/s/${user?.slug}`;
+  const productionUrl = import.meta.env.VITE_APP_URL || 'https://fundipro-v21.vercel.app';
+  const publicUrl = `${productionUrl}/s/${user?.slug}`;
 
   return (
     <FundiLayout title="Your Storefront">
