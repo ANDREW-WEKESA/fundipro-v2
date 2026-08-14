@@ -3,7 +3,6 @@ import FundiLayout from "./FundiLayout";
 import { Banner, Spinner, EmptyState } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import api, { errMsg } from "../../lib/api";
-import { QRCodeSVG } from "qrcode.react";
 
 const MAX_PHOTOS = 4;
 const STATUS_LABEL = { in_progress: "In progress", available: "Available", reserved: "Reserved", sold: "Sold" };
@@ -274,11 +273,10 @@ export default function StorefrontEditor() {
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             {/* QR Code Display */}
             <div className="bg-white p-6 rounded-xl border-2 border-dashed" style={{borderColor:"var(--border)"}}>
-              <QRCodeSVG 
-                value={publicUrl}
-                size={200}
-                level="H"
-                includeMargin={true}
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(publicUrl)}`}
+                alt="QR Code"
+                className="w-[200px] h-[200px]"
               />
             </div>
             
@@ -308,30 +306,13 @@ export default function StorefrontEditor() {
                 </div>
               </div>
               
-              <button 
-                onClick={() => {
-                  const svg = document.querySelector('.card svg');
-                  const svgData = new XMLSerializer().serializeToString(svg);
-                  const canvas = document.createElement('canvas');
-                  const ctx = canvas.getContext('2d');
-                  const img = new Image();
-                  img.onload = () => {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.fillStyle = 'white';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0);
-                    const a = document.createElement('a');
-                    a.download = `${user?.slug}-qr-code.png`;
-                    a.href = canvas.toDataURL('image/png');
-                    a.click();
-                  };
-                  img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
-                }}
-                className="btn-primary text-sm"
+              <a 
+                href={`https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=${encodeURIComponent(publicUrl)}`}
+                download={`${user?.slug}-qr-code.png`}
+                className="btn-primary text-sm inline-block"
               >
                 📥 Download QR Code
-              </button>
+              </a>
             </div>
           </div>
         </div>
