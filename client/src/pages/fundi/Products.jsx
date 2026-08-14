@@ -7,20 +7,72 @@ const STATUS_NEXT = { in_progress:"available", available:"reserved", reserved:"s
 const MAX_PHOTOS = 4;
 
 function PhotoGrid({ photos, onRemove, editable }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [lightbox, setLightbox] = useState(null);
+  
+  if (photos.length === 0) return null;
+
+  const nextPhoto = () => setCurrentIndex((i) => (i + 1) % photos.length);
+  const prevPhoto = () => setCurrentIndex((i) => (i - 1 + photos.length) % photos.length);
+
   return (
     <>
-      <div className={`grid gap-2 ${photos.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
-        {photos.map((p, i) => (
-          <div key={i} className="photo-thumb aspect-square" onClick={() => setLightbox(p)}>
-            <img src={p} alt={`photo ${i+1}`}/>
-            {editable && (
-              <button onClick={(e) => { e.stopPropagation(); onRemove(i); }}
-                className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-bad text-white text-xs font-bold flex items-center justify-center shadow">✕</button>
-            )}
-          </div>
-        ))}
+      <div className="relative rounded-xl overflow-hidden aspect-square">
+        <img 
+          src={photos[currentIndex]} 
+          alt={`photo ${currentIndex + 1}`} 
+          className="w-full h-full object-cover cursor-pointer"
+          onClick={() => setLightbox(photos[currentIndex])}
+        />
+        
+        {editable && (
+          <button 
+            onClick={(e) => { e.stopPropagation(); onRemove(currentIndex); }}
+            className="absolute top-2 right-2 h-7 w-7 rounded-full bg-bad text-white text-sm font-bold flex items-center justify-center shadow-lg z-10"
+          >
+            ✕
+          </button>
+        )}
+
+        {photos.length > 1 && (
+          <>
+            {/* Previous button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); prevPhoto(); }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-bark/70 hover:bg-bark text-white flex items-center justify-center shadow-lg transition-all"
+            >
+              ‹
+            </button>
+            
+            {/* Next button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); nextPhoto(); }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-bark/70 hover:bg-bark text-white flex items-center justify-center shadow-lg transition-all"
+            >
+              ›
+            </button>
+
+            {/* Indicator dots */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+              {photos.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => { e.stopPropagation(); setCurrentIndex(i); }}
+                  className={`h-2 w-2 rounded-full transition-all ${
+                    i === currentIndex ? "bg-white w-4" : "bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Photo counter */}
+            <div className="absolute top-2 left-2 bg-bark/60 text-white text-xs px-2 py-1 rounded-full">
+              {currentIndex + 1} / {photos.length}
+            </div>
+          </>
+        )}
       </div>
+
       {lightbox && (
         <div className="fixed inset-0 bg-bark/90 z-50 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
           <img src={lightbox} className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl object-contain"/>
