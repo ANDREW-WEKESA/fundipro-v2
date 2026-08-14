@@ -41,6 +41,11 @@ function ProductCard({ item, onStatusChange, onSave, onDelete }) {
     const remaining = MAX_PHOTOS - form.photos.length;
     if (remaining <= 0) return;
     Array.from(files).slice(0, remaining).forEach((file) => {
+      // Check file size (max 1MB per image)
+      if (file.size > 1024 * 1024) {
+        alert(`${file.name} is too large. Please use images under 1MB.`);
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => setForm((f) => ({ ...f, photos: [...f.photos, e.target.result] }));
       reader.readAsDataURL(file);
@@ -50,9 +55,13 @@ function ProductCard({ item, onStatusChange, onSave, onDelete }) {
   async function save() {
     setSaving(true); setError("");
     try {
+      console.log("Saving product with data:", { ...form, photos: `${form.photos.length} photos` });
       const updated = await onSave(item.id, { ...form, cash_price: Number(form.cash_price), hp_price: Number(form.hp_price) });
       setEditing(false);
-    } catch (err) { setError(errMsg(err)); }
+    } catch (err) { 
+      console.error("Save error:", err);
+      setError(errMsg(err)); 
+    }
     finally { setSaving(false); }
   }
 
