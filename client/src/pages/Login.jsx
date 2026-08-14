@@ -49,12 +49,6 @@ export default function Login() {
             <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
           <button className="btn-primary w-full" disabled={loading}>{loading ? "Logging in…" : "Log in"}</button>
-          <div className="text-xs text-muted bg-sand/40 rounded-lg p-3 space-y-1">
-            <p className="font-semibold text-bark">Demo accounts</p>
-            <p>Admin: 0700000000 / admin123</p>
-            <p>Pro fundi: 0711111111 / fundi123</p>
-            <p>Free fundi: 0733333333 / fundi123</p>
-          </div>
         </form>
         <p className="mt-3 text-center text-xs" style={{ color: "var(--muted)" }}>
           Forgot your password? Contact support on WhatsApp:{" "}
