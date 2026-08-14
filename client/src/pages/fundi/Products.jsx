@@ -8,12 +8,15 @@ const MAX_PHOTOS = 4;
 
 function PhotoGrid({ photos, onRemove, editable }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [lightbox, setLightbox] = useState(null);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
   
   if (photos.length === 0) return null;
 
   const nextPhoto = () => setCurrentIndex((i) => (i + 1) % photos.length);
   const prevPhoto = () => setCurrentIndex((i) => (i - 1 + photos.length) % photos.length);
+  
+  const nextLightbox = () => setLightboxIndex((i) => (i + 1) % photos.length);
+  const prevLightbox = () => setLightboxIndex((i) => (i - 1 + photos.length) % photos.length);
 
   return (
     <>
@@ -22,7 +25,7 @@ function PhotoGrid({ photos, onRemove, editable }) {
           src={photos[currentIndex]} 
           alt={`photo ${currentIndex + 1}`} 
           className="w-full h-full object-cover cursor-pointer"
-          onClick={() => setLightbox(photos[currentIndex])}
+          onClick={() => setLightboxIndex(currentIndex)}
         />
         
         {editable && (
@@ -73,25 +76,50 @@ function PhotoGrid({ photos, onRemove, editable }) {
         )}
       </div>
 
-      {lightbox && (
+      {lightboxIndex !== null && (
         <div 
           className="fixed inset-0 bg-bark/95 z-50 flex items-center justify-center p-4 overflow-auto" 
-          onClick={() => setLightbox(null)}
-          style={{ cursor: 'zoom-out' }}
+          onClick={() => setLightboxIndex(null)}
         >
-          <div className="relative flex items-center justify-center min-h-screen py-8">
+          <div className="relative flex items-center justify-center min-h-screen py-8" onClick={(e) => e.stopPropagation()}>
             <img 
-              src={lightbox} 
+              src={photos[lightboxIndex]} 
               className="max-w-full h-auto rounded-2xl shadow-2xl" 
-              style={{ maxHeight: 'none', cursor: 'zoom-out' }}
-              onClick={(e) => e.stopPropagation()}
+              style={{ maxHeight: 'none' }}
             />
+            
+            {/* Close button */}
             <button
-              onClick={() => setLightbox(null)}
-              className="fixed top-4 right-4 h-10 w-10 rounded-full bg-white text-bark text-xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all"
+              onClick={() => setLightboxIndex(null)}
+              className="fixed top-4 right-4 h-12 w-12 rounded-full bg-white text-bark text-2xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all z-10"
             >
               ✕
             </button>
+
+            {photos.length > 1 && (
+              <>
+                {/* Previous button */}
+                <button
+                  onClick={prevLightbox}
+                  className="fixed left-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full bg-white text-bark text-3xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all z-10"
+                >
+                  ‹
+                </button>
+                
+                {/* Next button */}
+                <button
+                  onClick={nextLightbox}
+                  className="fixed right-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full bg-white text-bark text-3xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all z-10"
+                >
+                  ›
+                </button>
+
+                {/* Photo counter */}
+                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-white text-bark text-sm px-4 py-2 rounded-full shadow-lg font-bold">
+                  {lightboxIndex + 1} / {photos.length}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
