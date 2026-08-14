@@ -1,0 +1,22 @@
+-- Add 20 products to John Mose's storefront
+INSERT INTO storefront_items (id, user_id, title, description, cash_price, hp_price, status, category, photos, created_at, updated_at) VALUES
+('prod001', 'dauQbEWwekpN', 'Mahogany Dining Table Set', '6-seater dining table with matching chairs, solid mahogany wood', 45000, 52000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod002', 'dauQbEWwekpN', 'King Size Bed Frame', 'Elegant king size bed with headboard storage', 35000, 40000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod003', 'dauQbEWwekpN', 'L-Shaped Office Desk', 'Spacious desk with cable management and drawers', 28000, 32000, 'in_progress', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod004', 'dauQbEWwekpN', 'Wardrobe Cabinet', '3-door wardrobe with mirror and shelves', 38000, 44000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod005', 'dauQbEWwekpN', 'TV Stand Console', 'Modern TV stand with storage compartments', 18000, 21000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod006', 'dauQbEWwekpN', 'Coffee Table Set', 'Glass top coffee table with 2 side tables', 22000, 26000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod007', 'dauQbEWwekpN', 'Bookshelf Unit', '5-tier bookshelf with solid wood construction', 15000, 18000, 'reserved', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod008', 'dauQbEWwekpN', 'Kitchen Cabinet Set', 'Complete kitchen cabinets with countertop', 75000, 85000, 'in_progress', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod009', 'dauQbEWwekpN', 'Baby Crib', 'Safe and sturdy baby crib with adjustable height', 12000, 14000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod010', 'dauQbEWwekpN', 'Bar Counter Set', 'Home bar counter with 4 bar stools', 42000, 48000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod011', 'dauQbEWwekpN', 'Study Desk Chair Set', 'Ergonomic study desk with matching chair', 16000, 19000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod012', 'dauQbEWwekpN', 'Shoe Rack Cabinet', '4-tier shoe rack with seat on top', 9500, 11000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod013', 'dauQbEWwekpN', 'Patio Furniture Set', 'Outdoor table and 4 chairs weather resistant', 32000, 37000, 'sold', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod014', 'dauQbEWwekpN', 'Dressing Table Mirror', 'Elegant dressing table with large mirror', 24000, 28000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod015', 'dauQbEWwekpN', 'Children Study Desk', 'Colorful study desk perfect for kids', 11000, 13000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod016', 'dauQbEWwekpN', 'Office File Cabinet', '4-drawer filing cabinet with lock', 14000, 16000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod017', 'dauQbEWwekpN', 'Reception Desk', 'Professional reception desk for office', 48000, 55000, 'in_progress', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod018', 'dauQbEWwekpN', 'Bedside Tables Pair', 'Matching pair of bedside tables with drawers', 9500, 11000, 'available', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod019', 'dauQbEWwekpN', 'Church Pew Bench', 'Solid wood church pew seating 6 people', 35000, 40000, 'sold', 'Carpentry', '[]', datetime('now'), datetime('now')),
+('prod020', 'dauQbEWwekpN', 'Conference Table', 'Large conference table seats 12 people', 68000, 78000, 'reserved', 'Carpentry', '[]', datetime('now'), datetime('now'));
