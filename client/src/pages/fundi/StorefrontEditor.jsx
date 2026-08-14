@@ -3,6 +3,7 @@ import FundiLayout from "./FundiLayout";
 import { Banner, Spinner, EmptyState } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import api, { errMsg } from "../../lib/api";
+import { QRCodeSVG } from "qrcode.react";
 
 const MAX_PHOTOS = 4;
 const STATUS_LABEL = { in_progress: "In progress", available: "Available", reserved: "Reserved", sold: "Sold" };
@@ -260,6 +261,80 @@ export default function StorefrontEditor() {
             {publicUrl}
           </a>
         </Banner>
+
+        {/* QR Code Card */}
+        <div className="card space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-display font-bold text-bark dark:text-sand">Print Your QR Code</h2>
+              <p className="text-sm mt-1" style={{color:"var(--muted)"}}>Print this QR code and mount it in your workshop, shop, or workspace. Clients can scan to view your storefront instantly.</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-6 items-start">
+            {/* QR Code Display */}
+            <div className="bg-white p-6 rounded-xl border-2 border-dashed" style={{borderColor:"var(--border)"}}>
+              <QRCodeSVG 
+                value={publicUrl}
+                size={200}
+                level="H"
+                includeMargin={true}
+              />
+            </div>
+            
+            {/* Instructions */}
+            <div className="flex-1 space-y-3">
+              <div className="flex items-start gap-2">
+                <span className="text-xl">🖨️</span>
+                <div>
+                  <p className="font-semibold text-sm" style={{color:"var(--ink)"}}>How to print:</p>
+                  <p className="text-xs mt-0.5" style={{color:"var(--muted)"}}>Right-click the QR code → Save image, then print on A4 paper</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-2">
+                <span className="text-xl">📱</span>
+                <div>
+                  <p className="font-semibold text-sm" style={{color:"var(--ink)"}}>Clients scan with phone camera</p>
+                  <p className="text-xs mt-0.5" style={{color:"var(--muted)"}}>Opens your storefront directly - no app needed</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-2">
+                <span className="text-xl">🏪</span>
+                <div>
+                  <p className="font-semibold text-sm" style={{color:"var(--ink)"}}>Display anywhere</p>
+                  <p className="text-xs mt-0.5" style={{color:"var(--muted)"}}>Workshop wall, market stall, shop window, business card</p>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => {
+                  const svg = document.querySelector('.card svg');
+                  const svgData = new XMLSerializer().serializeToString(svg);
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  const img = new Image();
+                  img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    const a = document.createElement('a');
+                    a.download = `${user?.slug}-qr-code.png`;
+                    a.href = canvas.toDataURL('image/png');
+                    a.click();
+                  };
+                  img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+                }}
+                className="btn-primary text-sm"
+              >
+                📥 Download QR Code
+              </button>
+            </div>
+          </div>
+        </div>
 
         <form onSubmit={saveProfile} className="card space-y-4">
           <h2 className="font-display font-bold text-bark dark:text-sand">Profile</h2>
