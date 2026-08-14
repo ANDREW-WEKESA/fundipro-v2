@@ -74,8 +74,25 @@ function PhotoGrid({ photos, onRemove, editable }) {
       </div>
 
       {lightbox && (
-        <div className="fixed inset-0 bg-bark/90 z-50 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
-          <img src={lightbox} className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl object-contain"/>
+        <div 
+          className="fixed inset-0 bg-bark/95 z-50 flex items-center justify-center p-4 overflow-auto" 
+          onClick={() => setLightbox(null)}
+          style={{ cursor: 'zoom-out' }}
+        >
+          <div className="relative flex items-center justify-center min-h-screen py-8">
+            <img 
+              src={lightbox} 
+              className="max-w-full h-auto rounded-2xl shadow-2xl" 
+              style={{ maxHeight: 'none', cursor: 'zoom-out' }}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button
+              onClick={() => setLightbox(null)}
+              className="fixed top-4 right-4 h-10 w-10 rounded-full bg-white text-bark text-xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
     </>
