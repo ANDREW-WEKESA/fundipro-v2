@@ -69,14 +69,10 @@ export async function handleStorefront(request, env, path) {
       ];
       
       for (const [id, amount, description, customer_name, payment_method, sale_date] of sales) {
-        try {
-          await env.DB.prepare(
-            `INSERT INTO sales (id, user_id, amount, description, customer_name, payment_method, date, created_at) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))`
-          ).bind(id, userId, amount, description, customer_name, payment_method, sale_date).run();
-        } catch (e) {
-          // Skip if sales table doesn't exist
-        }
+        await env.DB.prepare(
+          `INSERT INTO sales (id, user_id, amount, description, customer_name, payment_method, date, created_at) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))`
+        ).bind(id, userId, amount, description, customer_name, payment_method, sale_date).run();
       }
       
       // Insert 8 orders
@@ -92,14 +88,10 @@ export async function handleStorefront(request, env, path) {
       ];
       
       for (const [id, product_id, product_title, customer_name, customer_phone, order_type, payment_type, total_price, amount_paid, status, notes] of orders) {
-        try {
-          await env.DB.prepare(
-            `INSERT INTO orders (id, fundi_id, product_id, product_title, customer_name, customer_phone, order_type, payment_type, total_price, amount_paid, status, notes, placed_by, created_at) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'customer', datetime('now'))`
-          ).bind(id, userId, product_id, product_title, customer_name, customer_phone, order_type, payment_type, total_price, amount_paid, status, notes).run();
-        } catch (e) {
-          // Skip if orders table doesn't exist
-        }
+        await env.DB.prepare(
+          `INSERT INTO orders (id, fundi_id, product_id, product_title, customer_name, customer_phone, order_type, payment_type, total_price, amount_paid, status, notes, placed_by, created_at) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'customer', datetime('now'))`
+        ).bind(id, userId, product_id, product_title, customer_name, customer_phone, order_type, payment_type, total_price, amount_paid, status, notes).run();
       }
       
       return json({ success: true, message: 'Demo data seeded successfully! Added 20 products, 10 sales, and 8 orders for John Mose.' });
