@@ -93,9 +93,9 @@ function ProductCard({ item, onStatusChange, onSave, onDelete }) {
     const remaining = MAX_PHOTOS - form.photos.length;
     if (remaining <= 0) return;
     Array.from(files).slice(0, remaining).forEach((file) => {
-      // Check file size (max 1MB per image)
-      if (file.size > 1024 * 1024) {
-        alert(`${file.name} is too large. Please use images under 1MB.`);
+      // Check file size (max 5MB per image)
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`${file.name} is too large. Please use images under 5MB.`);
         return;
       }
       const reader = new FileReader();
@@ -201,6 +201,11 @@ function AddProductModal({ onClose, onAdded }) {
   function addPhotos(files) {
     const remaining = MAX_PHOTOS - form.photos.length;
     Array.from(files).slice(0, remaining).forEach((file) => {
+      // Check file size (max 5MB per image)
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`${file.name} is too large. Please use images under 5MB.`);
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => setForm((f) => ({ ...f, photos: [...f.photos, e.target.result] }));
       reader.readAsDataURL(file);
