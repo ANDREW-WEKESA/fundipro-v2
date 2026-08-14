@@ -56,24 +56,24 @@ export async function handleStorefront(request, env, path) {
       
       // Insert 10 sales records (no foreign keys, just standalone records)
       const sales = [
-        ['sale001', 'Mahogany Dining Table Set', 1, 45000, 45000, 'cash', 'James Kamau', '0722334455', '2026-08-10', 'Delivered to Westlands'],
-        ['sale002', 'TV Stand Console', 2, 18000, 36000, 'mpesa', 'Mary Wanjiku', '0733445566', '2026-08-11', 'Bulk order discount given'],
-        ['sale003', 'Coffee Table Set', 1, 22000, 22000, 'hp', 'Peter Omondi', '0744556677', '2026-08-11', 'HP payment plan - 6 months'],
-        ['sale004', 'Baby Crib', 3, 12000, 36000, 'cash', 'Grace Akinyi', '0755667788', '2026-08-12', 'Hospital bulk order'],
-        ['sale005', 'Shoe Rack Cabinet', 2, 9500, 19000, 'mpesa', 'David Mutua', '0766778899', '2026-08-12', ''],
-        ['sale006', 'Patio Furniture Set', 1, 32000, 32000, 'cash', 'Sarah Njeri', '0777889900', '2026-08-13', 'Delivered to Karen'],
-        ['sale007', 'Study Desk Chair Set', 4, 16000, 64000, 'mpesa', 'St. Mary School', '0788990011', '2026-08-13', 'School furniture order'],
-        ['sale008', 'Bookshelf Unit', 1, 15000, 15000, 'hp', 'John Mwangi', '0799001122', '2026-08-13', 'HP - 4 months'],
-        ['sale009', 'Bedside Tables Pair', 3, 9500, 28500, 'cash', 'Hotel Paradise', '0700112233', '2026-08-14', 'Hotel rooms furniture'],
-        ['sale010', 'Church Pew Bench', 5, 35000, 175000, 'mpesa', 'ACK Church', '0711223344', '2026-08-14', 'Church renovation project'],
+        ['sale001', 45000, 'Mahogany Dining Table Set', 'James Kamau', 'cash', '2026-08-10'],
+        ['sale002', 36000, 'TV Stand Console (x2)', 'Mary Wanjiku', 'mpesa', '2026-08-11'],
+        ['sale003', 22000, 'Coffee Table Set', 'Peter Omondi', 'cash', '2026-08-11'],
+        ['sale004', 36000, 'Baby Crib (x3)', 'Grace Akinyi', 'cash', '2026-08-12'],
+        ['sale005', 19000, 'Shoe Rack Cabinet (x2)', 'David Mutua', 'mpesa', '2026-08-12'],
+        ['sale006', 32000, 'Patio Furniture Set', 'Sarah Njeri', 'cash', '2026-08-13'],
+        ['sale007', 64000, 'Study Desk Chair Set (x4)', 'St. Mary School', 'mpesa', '2026-08-13'],
+        ['sale008', 15000, 'Bookshelf Unit', 'John Mwangi', 'cash', '2026-08-13'],
+        ['sale009', 28500, 'Bedside Tables Pair (x3)', 'Hotel Paradise', 'cash', '2026-08-14'],
+        ['sale010', 175000, 'Church Pew Bench (x5)', 'ACK Church', 'mpesa', '2026-08-14'],
       ];
       
-      for (const [id, item_name, quantity, unit_price, total_price, payment_method, customer_name, customer_phone, sale_date, notes] of sales) {
+      for (const [id, amount, description, customer_name, payment_method, sale_date] of sales) {
         try {
           await env.DB.prepare(
-            `INSERT INTO sales (id, user_id, item_name, quantity, unit_price, total_price, payment_method, customer_name, customer_phone, sale_date, notes, created_at) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
-          ).bind(id, userId, item_name, quantity, unit_price, total_price, payment_method, customer_name, customer_phone, sale_date, notes).run();
+            `INSERT INTO sales (id, user_id, amount, description, customer_name, payment_method, date, created_at) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))`
+          ).bind(id, userId, amount, description, customer_name, payment_method, sale_date).run();
         } catch (e) {
           // Skip if sales table doesn't exist
         }
