@@ -78,49 +78,49 @@ function PhotoGrid({ photos, onRemove, editable }) {
 
       {lightboxIndex !== null && (
         <div 
-          className="fixed inset-0 bg-bark/95 z-50 flex items-center justify-center p-4 overflow-auto" 
+          className="fixed inset-0 bg-bark/95 z-50 flex items-center justify-center" 
           onClick={() => setLightboxIndex(null)}
         >
-          <div className="relative flex items-center justify-center min-h-screen py-8" onClick={(e) => e.stopPropagation()}>
+          {/* Main image container */}
+          <div className="relative w-full h-full flex items-center justify-center p-16" onClick={(e) => e.stopPropagation()}>
             <img 
               src={photos[lightboxIndex]} 
-              className="max-w-full h-auto rounded-2xl shadow-2xl" 
-              style={{ maxHeight: 'none' }}
+              className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl"
             />
-            
-            {/* Close button */}
-            <button
-              onClick={() => setLightboxIndex(null)}
-              className="fixed top-4 right-4 h-12 w-12 rounded-full bg-white text-bark text-2xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all z-10"
-            >
-              ✕
-            </button>
-
-            {photos.length > 1 && (
-              <>
-                {/* Previous button */}
-                <button
-                  onClick={prevLightbox}
-                  className="fixed left-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full bg-white text-bark text-3xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all z-10"
-                >
-                  ‹
-                </button>
-                
-                {/* Next button */}
-                <button
-                  onClick={nextLightbox}
-                  className="fixed right-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full bg-white text-bark text-3xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all z-10"
-                >
-                  ›
-                </button>
-
-                {/* Photo counter */}
-                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-white text-bark text-sm px-4 py-2 rounded-full shadow-lg font-bold">
-                  {lightboxIndex + 1} / {photos.length}
-                </div>
-              </>
-            )}
           </div>
+          
+          {/* Close button */}
+          <button
+            onClick={() => setLightboxIndex(null)}
+            className="fixed top-4 right-4 h-12 w-12 rounded-full bg-white text-bark text-2xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all z-10"
+          >
+            ✕
+          </button>
+
+          {photos.length > 1 && (
+            <>
+              {/* Previous button */}
+              <button
+                onClick={(e) => { e.stopPropagation(); prevLightbox(); }}
+                className="fixed left-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full bg-white text-bark text-3xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all z-10"
+              >
+                ‹
+              </button>
+              
+              {/* Next button */}
+              <button
+                onClick={(e) => { e.stopPropagation(); nextLightbox(); }}
+                className="fixed right-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full bg-white text-bark text-3xl font-bold flex items-center justify-center shadow-lg hover:bg-sand transition-all z-10"
+              >
+                ›
+              </button>
+
+              {/* Photo counter */}
+              <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-white text-bark text-sm px-4 py-2 rounded-full shadow-lg font-bold">
+                {lightboxIndex + 1} / {photos.length}
+              </div>
+            </>
+          )}
         </div>
       )}
     </>
