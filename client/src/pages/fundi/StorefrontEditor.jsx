@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import FundiLayout from "./FundiLayout";
 import { Banner, Spinner, EmptyState } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
+import { useConfig } from "../../context/ConfigContext";
 import api, { errMsg } from "../../lib/api";
 
 const MAX_PHOTOS = 4;
@@ -199,15 +200,18 @@ function ProductCard({ item, onChanged, onDeleted }) {
 
 export default function StorefrontEditor() {
   const { user, tierConfig, refreshMe } = useAuth();
-  const [profile, setProfile] = useState({ bio: "", trade: "", location: "", whatsapp: "" });
+  const config = useConfig();
+  const [profile, setProfile] = useState({ bio: "", trade: "", location: "", whatsapp: "", till_number: "" });
   const [items, setItems] = useState(null);
   const [newItem, setNewItem] = useState({ title: "", description: "", cash_price: "", hp_price: "" });
   const [savedMsg, setSavedMsg] = useState("");
   const [error, setError] = useState("");
+  const [stkPushActive, setStkPushActive] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null);
 
   useEffect(() => {
     if (user) {
-      setProfile({ bio: user.bio || "", trade: user.trade || "", location: user.location || "", whatsapp: user.whatsapp || "" });
+      setProfile({ bio: user.bio || "", trade: user.trade || "", location: user.location || "", whatsapp: user.whatsapp || "", till_number: user.till_number || "" });
     }
     api.get("/storefront/me/items").then(({ data }) => setItems(data.items));
   }, [user]);
@@ -245,6 +249,67 @@ export default function StorefrontEditor() {
   async function removeItem(id) {
     await api.delete(`/storefront/me/items/${id}`);
     setItems((prev) => prev.filter((i) => i.id !== id));
+  }
+
+  async function initiateSTKPush() {
+    setStkPushActive(true);
+    setPaymentStatus("initiating");
+    setError("");
+    
+    try {
+      const { data } = await api.post("/payments/stk-push", {
+        tier: user.tier || "pro",
+        phone: user.phone,
+      });
+      
+      setPaymentStatus("pending");
+      
+      // Poll for payment status
+      const paymentId = data.paymentId;
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await api.get(`/payments/${paymentId}/status`);
+          const payment = statusRes.data.payment;
+          
+          if (payment.status === "success") {
+            clearInterval(pollInterval);
+            setPaymentStatus("success");
+            await refreshMe();
+            setTimeout(() => {
+              setStkPushActive(false);
+              setPaymentStatus(null);
+            }, 3000);
+          } else if (payment.status === "failed") {
+            clearInterval(pollInterval);
+            setPaymentStatus("failed");
+            setError("Payment failed. Please try again.");
+            setTimeout(() => {
+              setStkPushActive(false);
+              setPaymentStatus(null);
+            }, 3000);
+          }
+        } catch (err) {
+          console.error("Status check error:", err);
+        }
+      }, 3000); // Poll every 3 seconds
+      
+      // Stop polling after 2 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        if (paymentStatus === "pending") {
+          setPaymentStatus("timeout");
+          setError("Payment timed out. Please check your M-Pesa and try again if payment didn't go through.");
+        }
+      }, 120000);
+      
+    } catch (err) {
+      setPaymentStatus("failed");
+      setError(errMsg(err));
+      setTimeout(() => {
+        setStkPushActive(false);
+        setPaymentStatus(null);
+      }, 3000);
+    }
   }
 
   const isPublic = true; // All fundis can have a storefront
@@ -317,6 +382,109 @@ export default function StorefrontEditor() {
           </div>
         </div>
 
+        {/* Monthly Subscription Payment Section */}
+        {user?.tier !== 'free' && (
+          <div className="card space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h2 className="font-display font-bold text-bark dark:text-sand">💳 Pay Monthly Subscription</h2>
+                <p className="text-sm mt-1" style={{color:"var(--muted)"}}>
+                  Your {user?.tier === 'pro' ? 'Pro' : 'Premium'} plan costs KES {tierConfig?.price || 0} per month.
+                </p>
+              </div>
+            </div>
+
+            {stkPushActive && (
+              <div className="bg-terracotta/10 dark:bg-terracotta/20 rounded-xl p-6 text-center space-y-3">
+                {paymentStatus === "initiating" && (
+                  <>
+                    <div className="text-4xl">⏳</div>
+                    <p className="font-semibold" style={{color:"var(--ink)"}}>Initiating payment...</p>
+                  </>
+                )}
+                {paymentStatus === "pending" && (
+                  <>
+                    <div className="text-4xl">📱</div>
+                    <p className="font-semibold" style={{color:"var(--ink)"}}>Check your phone!</p>
+                    <p className="text-sm" style={{color:"var(--muted)"}}>
+                      Enter your M-Pesa PIN to complete payment of KES {tierConfig?.price || 0}
+                    </p>
+                    <Spinner />
+                  </>
+                )}
+                {paymentStatus === "success" && (
+                  <>
+                    <div className="text-4xl">✅</div>
+                    <p className="font-semibold text-good">Payment successful!</p>
+                    <p className="text-sm" style={{color:"var(--muted)"}}>Your account has been activated.</p>
+                  </>
+                )}
+                {paymentStatus === "failed" && (
+                  <>
+                    <div className="text-4xl">❌</div>
+                    <p className="font-semibold text-bad">Payment failed</p>
+                    <p className="text-sm" style={{color:"var(--muted)"}}>{error}</p>
+                  </>
+                )}
+              </div>
+            )}
+            
+            <div className="bg-terracotta/10 dark:bg-terracotta/20 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">📱</span>
+                <div>
+                  <p className="font-semibold" style={{color:"var(--ink)"}}>Pay via M-Pesa</p>
+                  <p className="text-sm" style={{color:"var(--muted)"}}>Choose your preferred payment method</p>
+                </div>
+              </div>
+
+              {/* STK Push Button */}
+              <button
+                onClick={initiateSTKPush}
+                disabled={stkPushActive}
+                className="btn-primary w-full py-3 text-base"
+              >
+                {stkPushActive ? "Processing..." : "💳 Pay Now with M-Pesa STK Push"}
+              </button>
+              <p className="text-xs text-center" style={{color:"var(--muted)"}}>
+                Get instant payment prompt on your phone ({user?.phone})
+              </p>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t" style={{borderColor:"var(--border)"}}></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-terracotta/10 dark:bg-terracotta/20 px-2" style={{color:"var(--muted)"}}>Or pay manually</span>
+                </div>
+              </div>
+              
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="bg-white dark:bg-bark rounded-lg p-3">
+                  <p className="text-xs font-semibold mb-1" style={{color:"var(--muted)"}}>Till Number:</p>
+                  <p className="text-2xl font-bold text-terracotta">{config.platform_till_number || "1725732"}</p>
+                </div>
+                <div className="bg-white dark:bg-bark rounded-lg p-3">
+                  <p className="text-xs font-semibold mb-1" style={{color:"var(--muted)"}}>Amount:</p>
+                  <p className="text-2xl font-bold text-terracotta">KES {tierConfig?.price || 0}</p>
+                </div>
+              </div>
+
+              <div className="text-xs space-y-1" style={{color:"var(--muted)"}}>
+                <p>📍 <strong>Manual payment steps:</strong></p>
+                <ol className="list-decimal ml-5 space-y-0.5">
+                  <li>Go to M-Pesa menu on your phone</li>
+                  <li>Select "Lipa Na M-Pesa" → "Buy Goods and Services"</li>
+                  <li>Enter Till Number: <strong>{config.platform_till_number || "1725732"}</strong></li>
+                  <li>Enter amount: <strong>KES {tierConfig?.price || 0}</strong></li>
+                  <li>Enter your M-Pesa PIN and confirm</li>
+                </ol>
+                <p className="mt-2">✅ Your account will be activated within 1 hour of payment confirmation.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={saveProfile} className="card space-y-4">
           <h2 className="font-display font-bold text-bark dark:text-sand">Profile</h2>
           {error && <Banner kind="error">{error}</Banner>}
@@ -338,6 +506,11 @@ export default function StorefrontEditor() {
           <div>
             <label className="label">WhatsApp number</label>
             <input className="input" value={profile.whatsapp} onChange={(e) => setProfile((p) => ({ ...p, whatsapp: e.target.value }))} placeholder="07XXXXXXXX" />
+          </div>
+          <div>
+            <label className="label">M-Pesa Till Number (optional)</label>
+            <input className="input" value={profile.till_number} onChange={(e) => setProfile((p) => ({ ...p, till_number: e.target.value }))} placeholder="123456" />
+            <p className="text-xs mt-1" style={{color:"var(--muted)"}}>Add your M-Pesa Till Number so customers can pay you directly via Lipa Na M-Pesa</p>
           </div>
           <button className="btn-primary">Save changes</button>
         </form>

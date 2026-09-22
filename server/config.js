@@ -38,6 +38,7 @@ export const JWT_EXPIRES_IN = "30d";
 export const ADMIN_PHONE = "0710435113";          // Andrew's own login
 export const SUPPORT_WHATSAPP = "0107875549";      // fundis tap "Support" to reach Andrew directly
 export const SUPPORT_EMAIL = "andrewwekesa675@gmail.com";
+export const PLATFORM_TILL_NUMBER = "1725732";     // FundiPro M-Pesa Till Number for subscription payments
 
 // --- Reports ---
 export const REPORT_INTERVAL_DAYS = 20; // how often a statement is "due"

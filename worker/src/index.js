@@ -34,6 +34,7 @@ export default {
           support_whatsapp: env.SUPPORT_WHATSAPP || "0107875549",
           support_email: env.SUPPORT_EMAIL || "andrewwekesa675@gmail.com",
           report_interval_days: 20,
+          platform_till_number: env.PLATFORM_TILL_NUMBER || "1725732",
         });
       }
 

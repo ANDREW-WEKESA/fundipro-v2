@@ -46,6 +46,7 @@ function OrderModal({ product, fundi, onClose }) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   const price = product ? (form.payment_type === "hp" ? product.hp_price : product.cash_price) : 0;
 
@@ -57,17 +58,58 @@ function OrderModal({ product, fundi, onClose }) {
         product_id: product?.id || null,
       });
       setSubmitted(true);
+      // Show payment instructions if fundi has till number
+      if (fundi.till_number && product && form.payment_type === "cash") {
+        setShowPayment(true);
+      }
     } catch(err) { setError(errMsg(err)); }
     finally { setSending(false); }
   }
 
   if (submitted) return (
-    <Modal title="Order sent!" onClose={onClose}>
+    <Modal title={showPayment ? "💳 Payment Instructions" : "Order sent!"} onClose={onClose}>
       <div className="text-center py-6 space-y-4">
-        <div className="text-5xl">✅</div>
-        <p className="font-semibold" style={{color:"var(--ink)"}}>Your order is with {fundi.name}</p>
-        <p className="text-sm" style={{color:"var(--muted)"}}>They'll confirm and contact you directly on WhatsApp or phone. The product stays reserved for you until confirmed.</p>
-        <button onClick={onClose} className="btn-primary w-full">Done</button>
+        {showPayment && fundi.till_number ? (
+          <>
+            <div className="text-5xl">📱</div>
+            <p className="font-semibold" style={{color:"var(--ink)"}}>Pay {fundi.name} via M-Pesa</p>
+            
+            <div className="bg-terracotta/10 rounded-xl p-4 space-y-3 text-left">
+              <div className="bg-white dark:bg-bark rounded-lg p-3 text-center">
+                <p className="text-xs font-semibold mb-1" style={{color:"var(--muted)"}}>Till Number:</p>
+                <p className="text-3xl font-bold text-terracotta">{fundi.till_number}</p>
+              </div>
+              
+              <div className="bg-white dark:bg-bark rounded-lg p-3 text-center">
+                <p className="text-xs font-semibold mb-1" style={{color:"var(--muted)"}}>Amount to Pay:</p>
+                <p className="text-2xl font-bold text-terracotta">KES {price.toLocaleString()}</p>
+              </div>
+
+              <div className="text-xs space-y-1" style={{color:"var(--muted)"}}>
+                <p>📍 <strong>How to pay:</strong></p>
+                <ol className="list-decimal ml-5 space-y-0.5">
+                  <li>Go to M-Pesa on your phone</li>
+                  <li>Select "Lipa Na M-Pesa" → "Buy Goods and Services"</li>
+                  <li>Enter Till: <strong>{fundi.till_number}</strong></li>
+                  <li>Enter amount: <strong>KES {price.toLocaleString()}</strong></li>
+                  <li>Enter PIN and confirm</li>
+                </ol>
+              </div>
+            </div>
+            
+            <p className="text-sm" style={{color:"var(--muted)"}}>
+              {fundi.name} will confirm your payment and contact you on WhatsApp or phone to arrange pickup.
+            </p>
+            <button onClick={onClose} className="btn-primary w-full">Done</button>
+          </>
+        ) : (
+          <>
+            <div className="text-5xl">✅</div>
+            <p className="font-semibold" style={{color:"var(--ink)"}}>Your order is with {fundi.name}</p>
+            <p className="text-sm" style={{color:"var(--muted)"}}>They'll confirm and contact you directly on WhatsApp or phone. The product stays reserved for you until confirmed.</p>
+            <button onClick={onClose} className="btn-primary w-full">Done</button>
+          </>
+        )}
       </div>
     </Modal>
   );
@@ -167,6 +209,27 @@ export default function Storefront() {
       </section>
 
       <div className="max-w-4xl mx-auto px-5 py-10 space-y-10">
+        {/* Payment Information Banner */}
+        {profile.till_number && (
+          <div className="card bg-gradient-to-r from-terracotta/10 to-terracotta/5 dark:from-terracotta/20 dark:to-terracotta/10 border-2 border-terracotta/20">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl">📱</span>
+                  <h3 className="font-display font-bold text-bark dark:text-sand">Pay via M-Pesa</h3>
+                </div>
+                <p className="text-sm" style={{color:"var(--muted)"}}>
+                  Send payment directly to {profile.name?.split(" ")[0]}'s M-Pesa Till Number
+                </p>
+              </div>
+              <div className="bg-white dark:bg-bark rounded-xl p-4 text-center shadow-sm">
+                <p className="text-xs font-semibold mb-1" style={{color:"var(--muted)"}}>Till Number</p>
+                <p className="text-3xl font-bold text-terracotta">{profile.till_number}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Available products */}
         {available.length > 0 && (
           <section>

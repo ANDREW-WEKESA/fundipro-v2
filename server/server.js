@@ -19,7 +19,7 @@ import auditRoutes from "./routes/audit.js";
 import salesRoutes from "./routes/sales.js";
 import expensesRoutes from "./routes/expenses.js";
 import uploadsRoutes from "./routes/uploads.js";
-import { SUPPORT_WHATSAPP, SUPPORT_EMAIL, REPORT_INTERVAL_DAYS } from "./config.js";
+import { SUPPORT_WHATSAPP, SUPPORT_EMAIL, REPORT_INTERVAL_DAYS, PLATFORM_TILL_NUMBER } from "./config.js";
 
 dotenv.config();
 
@@ -45,7 +45,12 @@ app.get("/api/health", (req, res) => res.json({ ok: true, name: "FundiPro API" }
 // Public, static platform info — single source of truth for contact details
 // shown in the Settings / Support pages on the frontend.
 app.get("/api/config", (req, res) => {
-  res.json({ support_whatsapp: SUPPORT_WHATSAPP, support_email: SUPPORT_EMAIL, report_interval_days: REPORT_INTERVAL_DAYS });
+  res.json({ 
+    support_whatsapp: SUPPORT_WHATSAPP, 
+    support_email: SUPPORT_EMAIL, 
+    report_interval_days: REPORT_INTERVAL_DAYS,
+    platform_till_number: PLATFORM_TILL_NUMBER 
+  });
 });
 
 app.use("/api/auth", authRoutes);

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import FundiLayout from "./FundiLayout";
-import { Banner } from "../../components/ui";
+import { Banner, Spinner } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../lib/api";
+import { useConfig } from "../../context/ConfigContext";
+import api, { errMsg } from "../../lib/api";
 
 const PLAN_PRICE = 1200;
 
@@ -19,28 +20,174 @@ const FEATURES = [
   "Priority WhatsApp support",
 ];
 
-function PayModal({ onClose }) {
+function PayModal({ onClose, userPhone }) {
+  const config = useConfig();
+  const [stkPushActive, setStkPushActive] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+  const [error, setError] = useState("");
+
+  async function initiateSTKPush() {
+    setStkPushActive(true);
+    setPaymentStatus("initiating");
+    setError("");
+    
+    try {
+      const { data } = await api.post("/payments/stk-push", {
+        tier: "pro",
+        phone: userPhone,
+      });
+      
+      setPaymentStatus("pending");
+      
+      // Poll for payment status
+      const paymentId = data.paymentId;
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await api.get(`/payments/${paymentId}/status`);
+          const payment = statusRes.data.payment;
+          
+          if (payment.status === "success") {
+            clearInterval(pollInterval);
+            setPaymentStatus("success");
+            setTimeout(() => {
+              window.location.reload(); // Refresh to show updated tier
+            }, 2000);
+          } else if (payment.status === "failed") {
+            clearInterval(pollInterval);
+            setPaymentStatus("failed");
+            setError("Payment failed. Please try again or use manual payment.");
+          }
+        } catch (err) {
+          console.error("Status check error:", err);
+        }
+      }, 3000); // Poll every 3 seconds
+      
+      // Stop polling after 2 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        if (paymentStatus === "pending") {
+          setPaymentStatus("timeout");
+          setError("Payment timed out. Check your M-Pesa and contact support if payment went through.");
+        }
+      }, 120000);
+      
+    } catch (err) {
+      setPaymentStatus("failed");
+      setError(errMsg(err));
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-bark/60 flex items-center justify-center z-50 px-5">
-      <div className="bg-white rounded-2xl p-7 max-w-sm w-full text-center shadow-card space-y-4">
-        <div className="text-4xl">📱</div>
-        <h3 className="font-display font-bold text-bark text-lg">Pay KES 1,200 via M-Pesa</h3>
-        <div className="bg-sand/60 rounded-xl p-4 text-left space-y-2 text-sm">
-          <p className="font-semibold" style={{color:"var(--ink)"}}>Send to:</p>
-          <p style={{color:"var(--ink)"}}>📞 <strong>0710435113</strong> — Andrew Wekesa</p>
-          <p className="text-xs mt-1" style={{color:"var(--muted)"}}>Use your phone number as the M-Pesa reference so Andrew can identify your payment.</p>
+      <div className="bg-white dark:bg-bark rounded-2xl p-7 max-w-md w-full shadow-card space-y-4">
+        <div className="text-center">
+          <div className="text-4xl mb-2">📱</div>
+          <h3 className="font-display font-bold text-lg" style={{color:"var(--ink)"}}>Pay KES 1,200 for FundiPro</h3>
         </div>
-        <p className="text-sm" style={{color:"var(--muted)"}}>After paying, tap the button below to notify Andrew. Your account will be activated within minutes.</p>
-        <div className="flex gap-3">
-          <a
-            href={`https://wa.me/254107875549?text=Hi%20Andrew%2C%20I%20just%20paid%20KES%201200%20for%20FundiPro.%20Please%20activate%20my%20account.%20My%20phone%3A%20`}
-            target="_blank" rel="noreferrer"
-            className="btn-primary flex-1 justify-center"
-          >
-            💬 Contact Support on WhatsApp
-          </a>
-          <button className="btn-secondary flex-1" onClick={onClose}>Close</button>
-        </div>
+
+        {stkPushActive ? (
+          <div className="bg-terracotta/10 dark:bg-terracotta/20 rounded-xl p-6 text-center space-y-3">
+            {paymentStatus === "initiating" && (
+              <>
+                <div className="text-4xl">⏳</div>
+                <p className="font-semibold" style={{color:"var(--ink)"}}>Initiating payment...</p>
+              </>
+            )}
+            {paymentStatus === "pending" && (
+              <>
+                <div className="text-4xl">📱</div>
+                <p className="font-semibold" style={{color:"var(--ink)"}}>Check your phone!</p>
+                <p className="text-sm" style={{color:"var(--muted)"}}>
+                  Enter your M-Pesa PIN to complete payment of KES 1,200
+                </p>
+                <Spinner />
+              </>
+            )}
+            {paymentStatus === "success" && (
+              <>
+                <div className="text-4xl">✅</div>
+                <p className="font-semibold text-good">Payment successful!</p>
+                <p className="text-sm" style={{color:"var(--muted)"}}>Your account is now active. Refreshing...</p>
+              </>
+            )}
+            {(paymentStatus === "failed" || paymentStatus === "timeout") && (
+              <>
+                <div className="text-4xl">⚠️</div>
+                <p className="font-semibold" style={{color:"var(--ink)"}}>Automatic payment unavailable</p>
+                <p className="text-xs" style={{color:"var(--muted)"}}>{error}</p>
+                <p className="text-sm mt-2" style={{color:"var(--ink)"}}>Please use manual payment below instead.</p>
+                <button onClick={() => setStkPushActive(false)} className="btn-secondary w-full">Use Manual Payment</button>
+              </>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4">
+              {/* Manual Payment Option - Now Primary */}
+              <div className="bg-terracotta/10 dark:bg-terracotta/20 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">💳</span>
+                  <div>
+                    <p className="font-semibold" style={{color:"var(--ink)"}}>Pay via M-Pesa Lipa Na M-Pesa</p>
+                    <p className="text-xs" style={{color:"var(--muted)"}}>Quick and reliable</p>
+                  </div>
+                </div>
+                
+                <div className="bg-white dark:bg-bark rounded-lg p-4 text-center">
+                  <p className="text-xs font-semibold mb-2" style={{color:"var(--muted)"}}>Till Number</p>
+                  <p className="text-3xl font-bold text-terracotta mb-2">{config.platform_till_number || "1725732"}</p>
+                  <p className="text-xs" style={{color:"var(--muted)"}}>Amount: KES 1,200</p>
+                </div>
+
+                <div className="text-xs space-y-1" style={{color:"var(--muted)"}}>
+                  <p className="font-semibold" style={{color:"var(--ink)"}}>📍 How to pay:</p>
+                  <ol className="list-decimal ml-5 space-y-0.5">
+                    <li>Open M-Pesa on your phone</li>
+                    <li>Select "Lipa Na M-Pesa"</li>
+                    <li>Select "Buy Goods and Services"</li>
+                    <li>Enter Till Number: <strong>{config.platform_till_number || "1725732"}</strong></li>
+                    <li>Enter Amount: <strong>KES 1,200</strong></li>
+                    <li>Enter your M-Pesa PIN and confirm</li>
+                  </ol>
+                </div>
+
+                <a
+                  href={`https://wa.me/254107875549?text=Hi%2C%20I%20just%20paid%20KES%201200%20for%20FundiPro%20via%20till%20${config.platform_till_number || "1725732"}.%20Please%20activate%20my%20account.%20My%20phone%3A%20${userPhone}`}
+                  target="_blank" rel="noreferrer"
+                  className="btn-primary w-full text-center py-3"
+                >
+                  💬 Confirm Payment on WhatsApp
+                </a>
+                <p className="text-xs text-center" style={{color:"var(--muted)"}}>
+                  ✅ Account activated within 1 hour after confirmation
+                </p>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t" style={{borderColor:"var(--border)"}}></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white dark:bg-bark px-2" style={{color:"var(--muted)"}}>Or try automatic</span>
+                </div>
+              </div>
+
+              {/* STK Push Option - Now Secondary */}
+              <div className="bg-sand/30 dark:bg-white/5 rounded-xl p-4 space-y-3">
+                <p className="font-semibold text-sm" style={{color:"var(--ink)"}}>Automatic STK Push</p>
+                <p className="text-xs" style={{color:"var(--muted)"}}>Get payment prompt directly on your phone (may not work in sandbox mode)</p>
+                <button
+                  onClick={initiateSTKPush}
+                  className="btn-secondary w-full py-2 text-sm"
+                >
+                  Try STK Push Payment
+                </button>
+              </div>
+            </div>
+
+            <button className="btn-ghost w-full" onClick={onClose}>Close</button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -136,6 +283,7 @@ export default function Billing() {
 
       {showModal && (
         <PayModal
+          userPhone={user?.phone}
           onClose={() => { setShowModal(false); loadPayments(); }}
         />
       )}

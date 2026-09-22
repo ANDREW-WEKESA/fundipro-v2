@@ -18,6 +18,7 @@ function publicProfile(user) {
     location: user.location,
     bio: user.bio,
     whatsapp: user.whatsapp,
+    till_number: user.till_number,
     photo_url: user.photo_url,
     verified: tierConfig.storefrontPublic,
     tier: user.tier,
@@ -74,9 +75,9 @@ router.post("/:slug/reviews", (req, res) => {
 
 // ---- authenticated routes: managing your own storefront ----
 
-// PATCH /api/storefront/me/profile — edit bio, trade, location, whatsapp, photo
+// PATCH /api/storefront/me/profile — edit bio, trade, location, whatsapp, till_number, photo
 router.patch("/me/profile", requireAuth, (req, res) => {
-  const allowed = ["bio", "trade", "location", "whatsapp", "photo_url", "name"];
+  const allowed = ["bio", "trade", "location", "whatsapp", "till_number", "photo_url", "name"];
   const patch = {};
   for (const key of allowed) if (req.body?.[key] !== undefined) patch[key] = req.body[key];
 

@@ -10,3 +10,6 @@ qa_shots.py
 
 # Large product images
 client/public/images/
+
+.vercel
+.env*
