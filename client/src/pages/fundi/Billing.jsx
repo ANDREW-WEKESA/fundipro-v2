@@ -169,51 +169,9 @@ function PayModal({ onClose, userPhone }) {
                 </p>
               </div>
 
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t" style={{borderColor:"var(--border)"}}></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white dark:bg-bark px-2" style={{color:"var(--muted)"}}>Or try automatic</span>
-                </div>
-              </div>
-
-              {/* STK Push Option - Now Secondary */}
-              <div className="bg-sand/30 dark:bg-white/5 rounded-xl p-4 space-y-3">
-                <p className="font-semibold text-sm" style={{color:"var(--ink)"}}>Automatic STK Push</p>
-                <p className="text-xs" style={{color:"var(--muted)"}}>Get payment prompt directly on your phone (may not work in sandbox mode)</p>
-                
-                <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{color:"var(--ink)"}}>
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="254712345678"
-                    className="w-full px-3 py-2 rounded-lg border text-sm"
-                    style={{
-                      borderColor: "var(--border)",
-                      color: "var(--ink)",
-                      backgroundColor: "var(--bg)"
-                    }}
-                  />
-                  <p className="text-xs mt-1" style={{color:"var(--muted)"}}>
-                    Enter number in format: 254XXXXXXXXX
-                  </p>
-                </div>
-                
-                {error && (
-                  <p className="text-xs text-bad">{error}</p>
-                )}
-                
-                <button
-                  onClick={initiateSTKPush}
-                  className="btn-secondary w-full py-2 text-sm"
-                >
-                  Try STK Push Payment
-                </button>
+              {/* Note about STK Push */}
+              <div className="text-center text-xs pt-2" style={{color:"var(--muted)"}}>
+                💡 Automatic payment (STK Push) coming soon when we upgrade the till
               </div>
             </div>
 

@@ -111,7 +111,7 @@ export async function initiateSTKPush(env, phoneNumber, amount, accountReference
       BusinessShortCode: shortcode,
       Password: password,
       Timestamp: timestamp,
-      TransactionType: "CustomerBuyGoodsOnline", // Use "CustomerBuyGoodsOnline" for Till payments, "CustomerPayBillOnline" for Paybill
+      TransactionType: "CustomerPayBillOnline", // Use "CustomerPayBillOnline" for Paybill, "CustomerBuyGoodsOnline" for Till (sandbox may only support PayBill)
       Amount: Math.round(amount), // Must be integer
       PartyA: formattedPhone, // Customer phone
       PartyB: shortcode, // Business receiving payment
